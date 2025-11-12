@@ -1,23 +1,31 @@
+
 <div class="submit-container">
   <h2>Submit Experience</h2>
 
-  <form class="experience-form" (ngSubmit)="submitExperience()">
+  <!-- aggiungi #form="ngForm" -->
+  <form class="experience-form" #form="ngForm" (ngSubmit)="submitExperience(form)">
 
     <mat-form-field class="full-width">
       <mat-label>Title</mat-label>
-      <input matInput [(ngModel)]="title" name="title" required>
+      <input matInput [(ngModel)]="title" name="title" required #titleField="ngModel">
+      <mat-error *ngIf="titleField.invalid && titleField.touched">Title is required</mat-error>
     </mat-form-field>
 
     <mat-form-field class="full-width">
       <mat-label>Category</mat-label>
-      <input matInput [(ngModel)]="category" name="category" required>
+      <input matInput [(ngModel)]="category" name="category" required #categoryField="ngModel">
+      <mat-error *ngIf="categoryField.invalid && categoryField.touched">Category is required</mat-error>
     </mat-form-field>
 
     <mat-form-field class="full-width">
-      <mat-label>Experience Descriptions</mat-label>
-      <textarea matInput [(ngModel)]="body" name="body" rows="10" required></textarea>
+      <mat-label>Experience Description</mat-label>
+      <textarea matInput [(ngModel)]="body" name="body" rows="10" required #bodyField="ngModel"></textarea>
+      <mat-error *ngIf="bodyField.invalid && bodyField.touched">Description is required</mat-error>
     </mat-form-field>
 
-    <button mat-raised-button color="primary" type="submit">Submit</button>
+    <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
+      Submit
+    </button>
   </form>
 </div>
+
