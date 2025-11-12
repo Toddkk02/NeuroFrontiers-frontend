@@ -1,0 +1,23 @@
+<div class="submit-container">
+  <h2>Submit Experience</h2>
+
+  <form class="experience-form" (ngSubmit)="submitExperience()">
+
+    <mat-form-field class="full-width">
+      <mat-label>Title</mat-label>
+      <input matInput [(ngModel)]="title" name="title" required>
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+      <mat-label>Category</mat-label>
+      <input matInput [(ngModel)]="category" name="category" required>
+    </mat-form-field>
+
+    <mat-form-field class="full-width">
+      <mat-label>Experience Descriptions</mat-label>
+      <textarea matInput [(ngModel)]="body" name="body" rows="10" required></textarea>
+    </mat-form-field>
+
+    <button mat-raised-button color="primary" type="submit">Submit</button>
+  </form>
+</div>

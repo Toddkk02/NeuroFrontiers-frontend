@@ -1,0 +1,18 @@
+
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: #0a0a0f;
+  color: #e5e7eb;
+  font-family: 'Inter', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Orbitron', sans-serif;
+}

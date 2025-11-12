@@ -1,0 +1,15 @@
+.submit-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px;
+}
+
+.experience-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.full-width {
+  width: 100%;
+}
