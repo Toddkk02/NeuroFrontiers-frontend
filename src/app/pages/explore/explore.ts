@@ -34,6 +34,7 @@ export class Explore implements OnInit {
       },
     });
   }
+
   deletePost(id: number){
     if(confirm("do you really want to delete this post?")) {
       this.postService.deletePost(id).subscribe({
