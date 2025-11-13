@@ -4,13 +4,14 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { FormsModule } from '@angular/forms';
 import { PostService, Post } from '../service/post';
 import { MatButtonModule } from '@angular/material/button';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'submit-experience',
   styleUrls: ['submit-experience.css'],
   templateUrl: 'submit-experience.html',
   standalone: true,
-  imports: [FormsModule, MatFormFieldModule, MatInputModule, MatButtonModule],
+  imports: [FormsModule, MatFormFieldModule, MatInputModule, MatButtonModule, CommonModule],
 })
 export class SubmitExperienceComponent {
   title = '';
