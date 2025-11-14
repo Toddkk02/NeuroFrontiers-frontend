@@ -1,9 +1,17 @@
+
 <div class="hero">
   <h2>Welcome to Consciousness Explorer</h2>
   <p>
     A comprehensive platform for exploring and sharing experiences.
     Navigate through various perspectives and insights.
   </p>
+
+  <div class="auth-buttons">
+    <button *ngIf="!isLoggedIn" (click)="goToLogin()">Login</button>
+    <button *ngIf="!isLoggedIn" (click)="goToRegister()">Register</button>
+
+    <button *ngIf="isLoggedIn" (click)="logout()">Logout</button>
+  </div>
 </div>
 
 <div class="features">
@@ -20,3 +28,4 @@
     <p>Access harm reduction resources and information</p>
   </div>
 </div>
+
