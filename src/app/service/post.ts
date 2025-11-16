@@ -1,9 +1,7 @@
-
-
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
+import { Login } from '../pages/login/login';
 export interface Post {
   id: number;
   userId?: number;
@@ -22,6 +20,15 @@ export class PostService {
 
   constructor(private http: HttpClient) {}
 
+  // ✅ Helper per creare headers con JWT
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+  }
+
   getAllPost(): Observable<Post[]> {
     return this.http.get<Post[]>(this.apiUrl);
   }
@@ -30,11 +37,18 @@ export class PostService {
     return this.http.get<Post>(`${this.apiUrl}/${id}`);
   }
 
+  // ✅ QUESTO È IL FIX - aggiungi headers
   createPost(post: Post): Observable<Post> {
-    return this.http.post<Post>(this.apiUrl, post);
+    return this.http.post<Post>(this.apiUrl, post, {
+      headers: this.getAuthHeaders()  // ← IMPORTANTE
+    });
   }
+
   deletePost(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`);
+    return this.http.delete(`${this.apiUrl}/${id}`, {
+      headers: this.getAuthHeaders()  // ← Anche qui per DELETE
+    });
   }
+
 }
 

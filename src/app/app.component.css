@@ -82,3 +82,21 @@ mat-nav-list mat-icon {
   max-width: 1200px;
   margin: 0 auto;
 }
+.spacer {
+  flex: 1;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-info span {
+  color: #00ffff;
+}

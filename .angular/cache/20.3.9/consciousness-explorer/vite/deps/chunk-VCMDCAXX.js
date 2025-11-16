@@ -1,14 +1,14 @@
 import {
   _CdkPrivateStyleLoader
-} from "./chunk-A2U5SRQ5.js";
+} from "./chunk-RCH5UFKP.js";
+import {
+  BidiModule
+} from "./chunk-ATSGUHMB.js";
 import {
   Platform,
   coerceElement,
   coerceNumberProperty
-} from "./chunk-RDR6YSJA.js";
-import {
-  BidiModule
-} from "./chunk-WYELI7NT.js";
+} from "./chunk-WEEKSBSC.js";
 import {
   APP_ID,
   BehaviorSubject,
@@ -58,12 +58,12 @@ import {
   ɵɵdefineInjectable,
   ɵɵdefineInjector,
   ɵɵdefineNgModule
-} from "./chunk-UTXLXM6O.js";
+} from "./chunk-M265THU4.js";
 import {
   __spreadValues
 } from "./chunk-3OV72XIM.js";
 
-// ../node_modules/@angular/cdk/fesm2022/keycodes2.mjs
+// node_modules/@angular/cdk/fesm2022/keycodes2.mjs
 var TAB = 9;
 var ENTER = 13;
 var SHIFT = 16;
@@ -86,7 +86,7 @@ var Z = 90;
 var META = 91;
 var MAC_META = 224;
 
-// ../node_modules/@angular/cdk/fesm2022/shadow-dom.mjs
+// node_modules/@angular/cdk/fesm2022/shadow-dom.mjs
 var shadowDomIsSupported;
 function _supportsShadowDom() {
   if (shadowDomIsSupported == null) {
@@ -120,7 +120,7 @@ function _getEventTarget(event) {
   return event.composedPath ? event.composedPath()[0] : event.target;
 }
 
-// ../node_modules/@angular/cdk/fesm2022/fake-event-detection.mjs
+// node_modules/@angular/cdk/fesm2022/fake-event-detection.mjs
 function isFakeMousedownFromScreenReader(event) {
   return event.buttons === 0 || event.detail === 0;
 }
@@ -129,7 +129,7 @@ function isFakeTouchstartFromScreenReader(event) {
   return !!touch && touch.identifier === -1 && (touch.radiusX == null || touch.radiusX === 1) && (touch.radiusY == null || touch.radiusY === 1);
 }
 
-// ../node_modules/@angular/cdk/fesm2022/passive-listeners.mjs
+// node_modules/@angular/cdk/fesm2022/passive-listeners.mjs
 var supportsPassiveEvents;
 function supportsPassiveEventListeners() {
   if (supportsPassiveEvents == null && typeof window !== "undefined") {
@@ -147,7 +147,7 @@ function normalizePassiveListenerOptions(options) {
   return supportsPassiveEventListeners() ? options : !!options.capture;
 }
 
-// ../node_modules/@angular/cdk/fesm2022/focus-monitor.mjs
+// node_modules/@angular/cdk/fesm2022/focus-monitor.mjs
 var INPUT_MODALITY_DETECTOR_OPTIONS = new InjectionToken("cdk-input-modality-detector-options");
 var INPUT_MODALITY_DETECTOR_DEFAULT_OPTIONS = {
   ignoreKeys: [ALT, CONTROL, MAC_META, META, SHIFT]
@@ -627,7 +627,7 @@ var CdkMonitorFocus = class _CdkMonitorFocus {
   });
 })();
 
-// ../node_modules/@angular/cdk/fesm2022/private.mjs
+// node_modules/@angular/cdk/fesm2022/private.mjs
 var _VisuallyHiddenLoader = class __VisuallyHiddenLoader {
   static ɵfac = function _VisuallyHiddenLoader_Factory(__ngFactoryType__) {
     return new (__ngFactoryType__ || __VisuallyHiddenLoader)();
@@ -658,7 +658,7 @@ var _VisuallyHiddenLoader = class __VisuallyHiddenLoader {
   }], null, null);
 })();
 
-// ../node_modules/@angular/cdk/fesm2022/observers.mjs
+// node_modules/@angular/cdk/fesm2022/observers.mjs
 function shouldIgnoreRecord(record) {
   if (record.type === "characterData" && record.target instanceof Comment) {
     return true;
@@ -903,12 +903,12 @@ var ObserversModule = class _ObserversModule {
   }], null, null);
 })();
 
-// ../node_modules/@angular/cdk/fesm2022/array.mjs
+// node_modules/@angular/cdk/fesm2022/array.mjs
 function coerceArray(value) {
   return Array.isArray(value) ? value : [value];
 }
 
-// ../node_modules/@angular/cdk/fesm2022/breakpoints-observer.mjs
+// node_modules/@angular/cdk/fesm2022/breakpoints-observer.mjs
 var mediaQueriesForWebkitCompatibility = /* @__PURE__ */ new Set();
 var mediaQueryStyleNode;
 var MediaMatcher = class _MediaMatcher {
@@ -1080,7 +1080,7 @@ function splitQueries(queries) {
   return queries.map((query) => query.split(",")).reduce((a1, a2) => a1.concat(a2)).map((query) => query.trim());
 }
 
-// ../node_modules/@angular/cdk/fesm2022/a11y-module.mjs
+// node_modules/@angular/cdk/fesm2022/a11y-module.mjs
 var InteractivityChecker = class _InteractivityChecker {
   _platform = inject(Platform);
   constructor() {
@@ -1922,7 +1922,7 @@ var A11yModule = class _A11yModule {
   }], () => [], null);
 })();
 
-// ../node_modules/@angular/cdk/fesm2022/id-generator.mjs
+// node_modules/@angular/cdk/fesm2022/id-generator.mjs
 var counters = {};
 var _IdGenerator = class __IdGenerator {
   _appId = inject(APP_ID);
@@ -1957,7 +1957,7 @@ var _IdGenerator = class __IdGenerator {
   }], null, null);
 })();
 
-// ../node_modules/@angular/cdk/fesm2022/keycodes.mjs
+// node_modules/@angular/cdk/fesm2022/keycodes.mjs
 function hasModifierKey(event, ...modifiers) {
   if (modifiers.length) {
     return modifiers.some((modifier) => event[modifier]);
@@ -1965,7 +1965,7 @@ function hasModifierKey(event, ...modifiers) {
   return event.altKey || event.shiftKey || event.ctrlKey || event.metaKey;
 }
 
-// ../node_modules/@angular/cdk/fesm2022/typeahead.mjs
+// node_modules/@angular/cdk/fesm2022/typeahead.mjs
 var DEFAULT_TYPEAHEAD_DEBOUNCE_INTERVAL_MS = 200;
 var Typeahead = class {
   _letterKeyStream = new Subject();
@@ -2029,7 +2029,7 @@ var Typeahead = class {
   }
 };
 
-// ../node_modules/@angular/cdk/fesm2022/list-key-manager.mjs
+// node_modules/@angular/cdk/fesm2022/list-key-manager.mjs
 var ListKeyManager = class {
   _items;
   _activeItemIndex = signal(-1, ...ngDevMode ? [{ debugName: "_activeItemIndex" }] : []);
@@ -2361,7 +2361,7 @@ var ListKeyManager = class {
   }
 };
 
-// ../node_modules/@angular/cdk/fesm2022/focus-key-manager.mjs
+// node_modules/@angular/cdk/fesm2022/focus-key-manager.mjs
 var FocusKeyManager = class extends ListKeyManager {
   _origin = "program";
   /**
@@ -2380,7 +2380,7 @@ var FocusKeyManager = class extends ListKeyManager {
   }
 };
 
-// ../node_modules/@angular/cdk/fesm2022/coercion/private.mjs
+// node_modules/@angular/cdk/fesm2022/coercion/private.mjs
 function coerceObservable(data) {
   if (!isObservable(data)) {
     return of(data);
@@ -2388,7 +2388,7 @@ function coerceObservable(data) {
   return data;
 }
 
-// ../node_modules/@angular/cdk/fesm2022/tree-key-manager.mjs
+// node_modules/@angular/cdk/fesm2022/tree-key-manager.mjs
 var TreeKeyManager = class {
   /** The index of the currently active (focused) item. */
   _activeItemIndex = -1;
@@ -2692,7 +2692,7 @@ var TREE_KEY_MANAGER = new InjectionToken("tree-key-manager", {
   factory: TREE_KEY_MANAGER_FACTORY
 });
 
-// ../node_modules/@angular/cdk/fesm2022/a11y.mjs
+// node_modules/@angular/cdk/fesm2022/a11y.mjs
 var ID_DELIMITER = " ";
 function addAriaReferencedId(el, attr, id) {
   const ids = getAriaReferenceIds(el, attr);
@@ -3068,7 +3068,7 @@ var ConfigurableFocusTrapFactory = class _ConfigurableFocusTrapFactory {
   }], () => [], null);
 })();
 
-// ../node_modules/@angular/material/fesm2022/common-module.mjs
+// node_modules/@angular/material/fesm2022/common-module.mjs
 var MATERIAL_SANITY_CHECKS = new InjectionToken("mat-sanity-checks", {
   providedIn: "root",
   factory: () => true
@@ -3120,4 +3120,4 @@ export {
   FocusKeyManager,
   MatCommonModule
 };
-//# sourceMappingURL=chunk-YGDIY6RL.js.map
+//# sourceMappingURL=chunk-VCMDCAXX.js.map

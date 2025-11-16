@@ -3,13 +3,12 @@ import {
   CdkScrollableModule,
   ScrollDispatcher,
   ViewportRuler
-} from "./chunk-OXYYUGZV.js";
-import "./chunk-2YHCJPYB.js";
+} from "./chunk-6ETBEG2H.js";
+import "./chunk-A7FZGSTX.js";
 import {
   _animationsDisabled,
   coerceBooleanProperty
-} from "./chunk-SIQV7E6C.js";
-import "./chunk-NTYTVHX3.js";
+} from "./chunk-WZVGOXXZ.js";
 import {
   ESCAPE,
   FocusMonitor,
@@ -17,17 +16,18 @@ import {
   InteractivityChecker,
   MatCommonModule,
   hasModifierKey
-} from "./chunk-YGDIY6RL.js";
-import "./chunk-A2U5SRQ5.js";
+} from "./chunk-VCMDCAXX.js";
+import "./chunk-RCH5UFKP.js";
+import "./chunk-5EG33CFQ.js";
+import {
+  Directionality
+} from "./chunk-ATSGUHMB.js";
 import {
   Platform,
   coerceNumberProperty
-} from "./chunk-RDR6YSJA.js";
-import {
-  Directionality
-} from "./chunk-WYELI7NT.js";
-import "./chunk-VN2IVLSR.js";
-import "./chunk-6YVREBWA.js";
+} from "./chunk-WEEKSBSC.js";
+import "./chunk-53IOVJB7.js";
+import "./chunk-RDHXSB74.js";
 import {
   ChangeDetectionStrategy,
   ChangeDetectorRef,
@@ -86,10 +86,10 @@ import {
   ɵɵrestoreView,
   ɵɵstyleProp,
   ɵɵviewQuery
-} from "./chunk-UTXLXM6O.js";
+} from "./chunk-M265THU4.js";
 import "./chunk-3OV72XIM.js";
 
-// ../node_modules/@angular/material/fesm2022/sidenav.mjs
+// node_modules/@angular/material/fesm2022/sidenav.mjs
 var _c0 = ["*"];
 var _c1 = ["content"];
 var _c2 = [[["mat-drawer"]], [["mat-drawer-content"]], "*"];

@@ -34,11 +34,6 @@
   font-size: 16px;
 }
 
-.form-group input:focus {
-  outline: none;
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
-}
-
 button {
   width: 100%;
   padding: 12px;
@@ -49,13 +44,7 @@ button {
   font-size: 16px;
   font-weight: bold;
   cursor: pointer;
-  transition: all 0.3s;
   margin-top: 10px;
-}
-
-button:hover {
-  background: #00cccc;
-  box-shadow: 0 0 15px rgba(0, 255, 255, 0.5);
 }
 
 .error {
@@ -79,8 +68,4 @@ button:hover {
 .login-link a {
   color: #00ffff;
   text-decoration: none;
-}
-
-.login-link a:hover {
-  text-decoration: underline;
 }

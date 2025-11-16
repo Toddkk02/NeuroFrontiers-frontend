@@ -5,15 +5,6 @@
     A comprehensive platform for exploring and sharing experiences.
     Navigate through various perspectives and insights.
   </p>
-
-  <div class="auth-buttons">
-    <button *ngIf="!isLoggedIn" (click)="goToLogin()">Login</button>
-    <button *ngIf="!isLoggedIn" (click)="goToRegister()">Register</button>
-
-    <button *ngIf="isLoggedIn" (click)="logout()">Logout</button>
-  </div>
-</div>
-
 <div class="features">
   <div class="feature-card">
     <h3>Explore</h3>

@@ -1,6 +1,6 @@
 import {
   getDOM
-} from "./chunk-VN2IVLSR.js";
+} from "./chunk-53IOVJB7.js";
 import {
   APP_ID,
   CSP_NONCE,
@@ -19,9 +19,9 @@ import {
   setClassMetadata,
   ɵɵdefineInjectable,
   ɵɵinject
-} from "./chunk-UTXLXM6O.js";
+} from "./chunk-M265THU4.js";
 
-// ../node_modules/@angular/platform-browser/fesm2022/dom_renderer.mjs
+// node_modules/@angular/platform-browser/fesm2022/dom_renderer.mjs
 var EventManagerPlugin = class {
   _doc;
   // TODO: remove (has some usage in G3)
@@ -786,4 +786,4 @@ export {
    * License: MIT
    *)
 */
-//# sourceMappingURL=chunk-ZJ4B5KDG.js.map
+//# sourceMappingURL=chunk-Y5FN5N5X.js.map

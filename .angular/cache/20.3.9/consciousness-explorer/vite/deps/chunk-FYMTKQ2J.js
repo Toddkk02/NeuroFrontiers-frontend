@@ -5,21 +5,21 @@ import {
   EventManager,
   EventManagerPlugin,
   SharedStylesHost
-} from "./chunk-ZJ4B5KDG.js";
+} from "./chunk-Y5FN5N5X.js";
 import {
   withHttpTransferCache
-} from "./chunk-JX6PRGS3.js";
+} from "./chunk-ACBIKBO6.js";
 import {
   CommonModule,
   DomAdapter,
   PLATFORM_BROWSER_ID,
   getDOM,
   setRootDomAdapter
-} from "./chunk-VN2IVLSR.js";
+} from "./chunk-53IOVJB7.js";
 import {
   XhrFactory,
   parseCookieValue
-} from "./chunk-6YVREBWA.js";
+} from "./chunk-RDHXSB74.js";
 import {
   ApplicationModule,
   ApplicationRef,
@@ -75,12 +75,12 @@ import {
   ɵɵdefineInjector,
   ɵɵdefineNgModule,
   ɵɵinject
-} from "./chunk-UTXLXM6O.js";
+} from "./chunk-M265THU4.js";
 import {
   __spreadValues
 } from "./chunk-3OV72XIM.js";
 
-// ../node_modules/@angular/platform-browser/fesm2022/browser.mjs
+// node_modules/@angular/platform-browser/fesm2022/browser.mjs
 var BrowserDomAdapter = class _BrowserDomAdapter extends DomAdapter {
   supportsDOMEvents = true;
   static makeCurrent() {
@@ -495,7 +495,7 @@ var BrowserModule = class _BrowserModule {
   }], () => [], null);
 })();
 
-// ../node_modules/@angular/platform-browser/fesm2022/platform-browser.mjs
+// node_modules/@angular/platform-browser/fesm2022/platform-browser.mjs
 var Meta = class _Meta {
   _doc;
   _dom;
@@ -1288,4 +1288,4 @@ export {
    * License: MIT
    *)
 */
-//# sourceMappingURL=chunk-S7AN2WAO.js.map
+//# sourceMappingURL=chunk-FYMTKQ2J.js.map

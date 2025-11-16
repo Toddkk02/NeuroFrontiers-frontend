@@ -1,3 +1,4 @@
+
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
@@ -9,7 +10,7 @@ import { CommonModule } from '@angular/common';
   standalone: true,
   imports: [FormsModule, CommonModule],
   templateUrl: './login.html',
-  styleUrl: './login.css',
+  styleUrls: ['./login.css'],
 })
 export class Login {
   username = '';
@@ -19,24 +20,16 @@ export class Login {
   constructor(private router: Router, private http: HttpClient) {}
 
   onSubmit() {
-    this.http.post('http://localhost:3000/api/login', {
-      username: this.username,
-      password: this.password
-    }).subscribe({
+    this.http.post('http://localhost:3000/api/login', { username: this.username, password: this.password }).subscribe({
       next: (res: any) => {
         localStorage.setItem('token', res.token);
         localStorage.setItem('username', res.username);
-        next: (res: any) => {
-        localStorage.setItem('token', res.token);
-        localStorage.setItem('username', res.username);
-        localStorage.setItem('role', res.role);
-        this.router.navigate(['/home']);
-}
         this.router.navigate(['/home']);
       },
       error: (err) => {
-        this.error = err.error.error || 'Login failed';
+        this.error = err.error?.error || 'Login failed';
       }
     });
   }
 }
+
