@@ -19,7 +19,7 @@
     <div *ngFor="let post of posts" class="experience-card">
       <div class="card-header">
         <span class="category psychedelics">{{ post.category || 'Experience' }}</span>
-        <span class="date">{{ formatDate(post.timestamp) }}</span>
+
       </div>
 
       <h3 class="card-title">{{ post.title }}</h3>
@@ -28,11 +28,11 @@
         {{ post.body }}
       </p>
 
-      <!-- ✅ CORRETTO - mostra l'autore del post -->
+
       <span class="post-author">By {{ post.author }}</span>
 
       <div class="card-footer">
-        <span class="post-id">Post #{{ post.id }}</span>
+
         <button
           *ngIf="isAdmin()"
           (click)="deletePost(post.id)"

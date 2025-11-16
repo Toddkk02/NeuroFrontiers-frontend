@@ -15,7 +15,6 @@ export class Register {
   username = '';
   password = '';
   confirmPassword = '';
-  birthdate = '';
   error = '';
   success = '';
 
@@ -30,7 +29,6 @@ export class Register {
     this.http.post('http://localhost:3000/api/register', {
       username: this.username,
       password: this.password,
-      birthdate: this.birthdate || null
     }).subscribe({
       next: (res: any) => {
         this.success = 'Registration successful! Redirecting...';
