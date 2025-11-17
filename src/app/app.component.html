@@ -34,15 +34,47 @@
       </button>
       <h1>{{ title }}</h1>
 
-      <!-- LOGIN/REGISTER BUTTONS -->
       <div class="spacer"></div>
+
+      <!-- LOGIN/REGISTER BUTTONS (non loggato) -->
       <div class="auth-buttons" *ngIf="!isLoggedIn()">
         <button mat-button routerLink="/login">Login</button>
         <button mat-raised-button color="primary" routerLink="/register">Register</button>
       </div>
+
+      <!-- USER MENU (loggato) -->
       <div class="user-info" *ngIf="isLoggedIn()">
-        <span>{{ getUsername() }}</span>
-        <button mat-button (click)="logout()">Logout</button>
+        <span class="username-display">{{ getUsername() }}</span>
+
+        <!-- ✅ MENU DROPDOWN -->
+        <button mat-icon-button [matMenuTriggerFor]="userMenu">
+          <mat-icon>account_circle</mat-icon>
+        </button>
+
+        <mat-menu #userMenu="matMenu">
+          <button mat-menu-item (click)="goToProfile()">
+            <mat-icon>person</mat-icon>
+            <span>Profile</span>
+          </button>
+
+          <button mat-menu-item (click)="goToSettings()">
+            <mat-icon>settings</mat-icon>
+            <span>Settings</span>
+          </button>
+
+          <!-- Admin Panel (solo per admin) -->
+          <button mat-menu-item *ngIf="isAdmin()" routerLink="/admin">
+            <mat-icon>admin_panel_settings</mat-icon>
+            <span>Admin Panel</span>
+          </button>
+
+          <mat-divider></mat-divider>
+
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Logout</span>
+          </button>
+        </mat-menu>
       </div>
     </div>
 

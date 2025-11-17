@@ -1,15 +1,27 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Login } from '../pages/login/login';
+
 export interface Post {
   id: number;
-  userId?: number;
+  user_id?: number;
   title: string;
   body: string;
   category?: string;
   author: string;
-  timestamp?: string;
+  created_at?: string;
+  likes?: number;
+  views?: number;
+  comment_count?: number;
+}
+
+export interface Comment {
+  id: number;
+  post_id: number;
+  user_id: number;
+  author: string;
+  body: string;
+  created_at: string;
 }
 
 @Injectable({
@@ -20,7 +32,6 @@ export class PostService {
 
   constructor(private http: HttpClient) {}
 
-  // ✅ Helper per creare headers con JWT
   private getAuthHeaders(): HttpHeaders {
     const token = localStorage.getItem('token');
     return new HttpHeaders({
@@ -37,18 +48,50 @@ export class PostService {
     return this.http.get<Post>(`${this.apiUrl}/${id}`);
   }
 
-  // ✅ QUESTO È IL FIX - aggiungi headers
   createPost(post: Post): Observable<Post> {
     return this.http.post<Post>(this.apiUrl, post, {
-      headers: this.getAuthHeaders()  // ← IMPORTANTE
+      headers: this.getAuthHeaders()
     });
   }
 
   deletePost(id: number): Observable<any> {
     return this.http.delete(`${this.apiUrl}/${id}`, {
-      headers: this.getAuthHeaders()  // ← Anche qui per DELETE
+      headers: this.getAuthHeaders()
     });
   }
 
+  toggleLike(postId: number): Observable<{ liked: boolean; likes: number }> {
+    return this.http.post<{ liked: boolean; likes: number }>(
+      `${this.apiUrl}/${postId}/like`,
+      {},
+      { headers: this.getAuthHeaders() }
+    );
+  }
+
+  checkIfLiked(postId: number): Observable<{ liked: boolean }> {
+    return this.http.get<{ liked: boolean }>(
+      `${this.apiUrl}/${postId}/liked`,
+      { headers: this.getAuthHeaders() }
+    );
+  }
+
+  getComments(postId: number): Observable<Comment[]> {
+    return this.http.get<Comment[]>(`${this.apiUrl}/${postId}/comments`);
+  }
+
+  addComment(postId: number, body: string): Observable<Comment> {
+    return this.http.post<Comment>(
+      `${this.apiUrl}/${postId}/comments`,
+      { body },
+      { headers: this.getAuthHeaders() }
+    );
+  }
+
+  deleteComment(commentId: number): Observable<any> {
+    return this.http.delete(
+      `http://localhost:3000/api/comments/${commentId}`,
+      { headers: this.getAuthHeaders() }
+    );
+  }
 }
 

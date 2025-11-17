@@ -1,0 +1,3651 @@
+import { bootstrapApplication } from '@angular/platform-browser';
+import { appConfig } from './app/app.config';
+import { AppComponent } from './app/app.component';
+
+bootstrapApplication(AppComponent, appConfig)
+  .catch((err) => console.error(err));
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Explore } from './explore';
+
+describe('Explore', () => {
+  let component: Explore;
+  let fixture: ComponentFixture<Explore>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [Explore]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(Explore);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+<div class="explore-container">
+  <div class="header">
+    <h2>Explore Experiences</h2>
+    <p>Browse shared experiences from the community</p>
+  </div>
+
+  <div *ngIf="loading" class="loading">
+    <p>Loading...</p>
+  </div>
+
+  <div *ngIf="error" class="error">
+    <p>{{ error }}</p>
+  </div>
+
+  <div *ngIf="!loading && !error" class="experiences-grid">
+    <div *ngFor="let post of posts" class="experience-card" (click)="openPost(post.id)">
+
+      <div class="card-header">
+        <span class="category" [attr.data-category]="post.category">
+          {{ post.category || 'Experience' }}
+        </span>
+        <span class="date">{{ formatDate(post.created_at) }}</span>
+      </div>
+
+      <h3 class="card-title">{{ post.title }}</h3>
+
+      <p class="card-preview">
+        {{ truncateText(post.body, 150) }}
+      </p>
+
+      <span class="post-author">By {{ post.author }}</span>
+
+      <!-- ✅ AGGIUNGI QUESTA SEZIONE -->
+      <div class="card-stats">
+        <span class="stat">
+          <mat-icon>thumb_up</mat-icon>
+          {{ post.likes || 0 }}
+        </span>
+        <span class="stat">
+          <mat-icon>comment</mat-icon>
+          {{ post.comment_count || 0 }}
+        </span>
+        <span class="stat">
+          <mat-icon>visibility</mat-icon>
+          {{ post.views || 0 }}
+        </span>
+      </div>
+
+      <!-- Delete button solo per admin -->
+      <div class="card-footer" *ngIf="isAdmin()">
+        <button
+          (click)="deletePost(post.id, $event)"
+          class="delete-btn">
+          Delete
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+.explore-page {
+  padding: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+
+h1 {
+  color: #00ffff;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+}
+
+p {
+  color: #9ca3af;
+  font-size: 1.2rem;
+}
+.placeholder {
+  margin-top: 40px;
+  padding: 60px;
+  border: 2px dashed #00ffff;
+  border-radius: 8px;
+  text-align: center;
+}
+
+
+
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.delete-btn {
+  background: #ff0000;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.delete-btn:hover {
+  background: #cc0000;
+}
+.explore-page {
+  padding: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+h1 {
+  color: #00ffff;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+}
+
+p {
+  color: #9ca3af;
+  font-size: 1.2rem;
+}
+
+.placeholder {
+  margin-top: 40px;
+  padding: 60px;
+  border: 2px dashed #00ffff;
+  border-radius: 8px;
+  text-align: center;
+}
+
+/* ✅ Nuovi stili per le card */
+.experiences-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 30px;
+  margin-top: 30px;
+}
+
+.experience-card {
+  background: linear-gradient(135deg, #1a1f3a 0%, #0a0e27 100%);
+  border: 2px solid #00ffff;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+}
+
+.experience-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 30px rgba(0, 255, 255, 0.4);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.category {
+  background: #00ffff20;
+  color: #00ffff;
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  font-weight: bold;
+}
+
+.date {
+  color: #9ca3af;
+  font-size: 0.85rem;
+}
+
+.card-title {
+  color: #00ffff;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+}
+
+.card-preview {
+  color: #e5e7eb;
+  line-height: 1.6;
+  margin-bottom: 15px;
+  max-height: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ✅ Stile per l'autore */
+.post-author {
+  display: block;
+  color: #9ca3af;
+  font-size: 0.9rem;
+  margin-bottom: 15px;
+  font-style: italic;
+}
+
+.card-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 15px;
+  border-top: 1px solid #00ffff40;
+}
+
+.post-id {
+  color: #9ca3af;
+  font-size: 0.85rem;
+}
+
+.delete-btn {
+  background: #ff0000;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.delete-btn:hover {
+  background: #cc0000;
+}
+
+.loading, .error {
+  text-align: center;
+  color: #00ffff;
+  padding: 40px;
+  font-size: 1.2rem;
+}
+
+.error {
+  color: #ff6b6b;
+}.explore-container {
+  padding: 40px 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.header h2 {
+  color: #00ffff;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+}
+
+.header p {
+  color: #9ca3af;
+  font-size: 1.2rem;
+}
+
+.experiences-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 30px;
+}
+
+.experience-card {
+  background: linear-gradient(135deg, #1a1f3a 0%, #0a0e27 100%);
+  border: 2px solid #00ffff;
+  border-radius: 12px;
+  padding: 20px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+}
+
+.experience-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 30px rgba(0, 255, 255, 0.4);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.category {
+  background: #00ffff20;
+  color: #00ffff;
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 0.85rem;
+  font-weight: bold;
+  border: 1px solid #00ffff;
+}
+
+.date {
+  color: #9ca3af;
+  font-size: 0.85rem;
+}
+
+.card-title {
+  color: #00ffff;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.5rem;
+  margin-bottom: 15px;
+}
+
+.card-preview {
+  color: #e5e7eb;
+  line-height: 1.6;
+  margin-bottom: 15px;
+  flex-grow: 1;
+}
+
+.post-author {
+  display: block;
+  color: #9ca3af;
+  font-size: 0.9rem;
+  font-style: italic;
+  margin-bottom: 15px;
+}
+
+/* ✅ STATS */
+.card-stats {
+  display: flex;
+  gap: 15px;
+  padding-top: 15px;
+  border-top: 1px solid #00ffff40;
+  margin-bottom: 10px;
+}
+
+.stat {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
+
+.stat mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+  color: #00ffff;
+}
+
+.card-footer {
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #00ffff20;
+}
+
+.delete-btn {
+  background: #ff0000;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s;
+  font-weight: bold;
+}
+
+.delete-btn:hover {
+  background: #cc0000;
+}
+
+.loading, .error {
+  text-align: center;
+  padding: 60px;
+  color: #00ffff;
+  font-size: 1.2rem;
+}
+
+.error {
+  color: #ff6b6b;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .experiences-grid {
+    grid-template-columns: 1fr;
+  }
+}
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { PostService, Post } from '../../service/post';
+import { CommonModule } from '@angular/common';
+import { MatIconModule } from '@angular/material/icon';
+
+@Component({
+  selector: 'app-explore',
+  standalone: true,
+  imports: [CommonModule, MatIconModule],
+  templateUrl: './explore.html',
+  styleUrls: ['./explore.css'],
+})
+export class Explore implements OnInit {
+  posts: Post[] = [];
+  loading = true;
+  error = '';
+
+  constructor(
+    private postService: PostService,
+    private router: Router
+  ) {}
+
+  ngOnInit() {
+    this.loadPosts();
+  }
+
+  loadPosts() {
+    this.postService.getAllPost().subscribe({
+      next: (data: Post[]) => {
+        this.posts = data;
+        this.loading = false;
+        console.log('✅ Posts loaded:', data);
+      },
+      error: (err: any) => {
+        this.error = 'Error loading posts';
+        this.loading = false;
+        console.error('❌ Error:', err);
+      },
+    });
+  }
+
+  openPost(id: number) {
+    console.log('Opening post:', id);
+    this.router.navigate(['/post', id]);
+  }
+
+  isAdmin(): boolean {
+    return localStorage.getItem('role') === 'admin';
+  }
+
+  deletePost(id: number, event: Event) {
+    event.stopPropagation();
+
+    if (!confirm("Delete this post?")) return;
+
+    this.postService.deletePost(id).subscribe({
+      next: () => {
+        this.posts = this.posts.filter(p => p.id !== id);
+        console.log('✅ Post deleted');
+      },
+      error: (err: any) => {
+        console.error('❌ Delete error:', err);
+        alert('Failed to delete post');
+      }
+    });
+  }
+
+  truncateText(text: string, maxLength: number): string {
+    if (text.length <= maxLength) return text;
+    return text.substring(0, maxLength) + '...';
+  }
+
+  formatDate(timestamp: string | undefined): string {
+    if (!timestamp) return 'Unknown date';
+    const date = new Date(timestamp);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  }
+}
+
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Home } from './home';
+
+describe('Home', () => {
+  let component: Home;
+  let fixture: ComponentFixture<Home>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [Home]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(Home);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+.hero {
+  text-align: center;
+  padding: 60px 20px;
+  margin-bottom: 40px;
+}
+
+.features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 30px;
+  padding: 20px;
+}
+
+.feature-card {
+  background: linear-gradient(135deg, #1a1f3a 0%, #0a0e27 100%);
+  padding: 30px;
+  border-radius: 12px;
+  border: 2px solid #00ffff;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 5px 30px rgba(0, 255, 255, 0.4);
+}
+
+.feature-card h3 {
+  color: #00ffff;
+  font-family: 'Orbitron', sans-serif;
+  margin-bottom: 15px;
+}
+
+.feature-card p {
+  color: #9ca3af;
+  line-height: 1.6;
+}
+.auth-buttons {
+  margin-top: 20px;
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.auth-buttons button {
+  background-color: #007bff;
+  border: none;
+  color: white;
+  padding: 10px 18px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.auth-buttons button:hover {
+  background-color: #0056b3;
+}
+
+
+<div class="hero">
+  <h2>Welcome to Consciousness Explorer</h2>
+  <p>
+    A comprehensive platform for exploring and sharing experiences.
+    Navigate through various perspectives and insights.
+  </p>
+<div class="features">
+  <div class="feature-card">
+    <h3>Explore</h3>
+    <p>Discover shared experiences from the community</p>
+  </div>
+  <div class="feature-card">
+    <h3>Share</h3>
+    <p>Submit your own experiences and insights</p>
+  </div>
+  <div class="feature-card">
+    <h3>Learn</h3>
+    <p>Access harm reduction resources and information</p>
+  </div>
+</div>
+
+
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
+
+interface Substance {
+  name: string;
+  molecularName: string;
+  formula: string;
+  alsoKnownAs: string[];
+  image: string;
+}
+
+@Component({
+  selector: 'app-home',
+  standalone: true,
+  imports: [CommonModule],
+  templateUrl: './home.html',
+  styleUrls: ['./home.css']
+})
+export class HomeComponent implements OnInit {
+
+  isLoggedIn = false;
+  substances: Substance[] = [];   // ← MANCAVA
+
+  constructor(private router: Router) {}
+
+  ngOnInit() {
+    this.isLoggedIn = !!localStorage.getItem('token');
+    this.loadSubstances();
+  }
+
+  goToLogin() {
+    this.router.navigate(['/login']);
+  }
+
+  goToRegister() {
+    this.router.navigate(['/register']);
+  }
+
+  logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('role');
+    this.isLoggedIn = false;
+    this.router.navigate(['/login']);
+  }
+
+  loadSubstances() {
+    this.substances = [
+      {
+        name: 'DMT',
+        molecularName: 'N,N-Dimetiltriptamina',
+        formula: 'C12H16N2',
+        alsoKnownAs: ['Dimetiltriptamina', 'Dimitri', 'Businessman\'s Trip'],
+        image: 'assets/dmt.png'
+      },
+      {
+        name: 'LSD',
+        molecularName: 'Acido lisergico dietilamide',
+        formula: 'C20H25N3O',
+        alsoKnownAs: ['Acido lisergico', 'Acido diethylamide'],
+        image: 'assets/lsd.png'
+      },
+      {
+        name: 'Psilocibina',
+        molecularName: '4-fosforilossi-N,N-dimetiltriptamina',
+        formula: 'C12H17N2O4P',
+        alsoKnownAs: ['Magic Mushrooms'],
+        image: 'assets/psilocibina.png'
+      }
+    ];
+  }
+}
+
+<div class="login-container">
+  <h2>Login</h2>
+  
+  <form (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label>Username</label>
+      <input [(ngModel)]="username" name="username" type="text" required>
+    </div>
+    
+    <div class="form-group">
+      <label>Password</label>
+      <input [(ngModel)]="password" name="password" type="password" required>
+    </div>
+    
+    <p *ngIf="error" class="error">{{ error }}</p>
+    
+    <button type="submit">Login</button>
+    
+    <p class="register-link">
+      Don't have an account? <a routerLink="/register">Register</a>
+    </p>
+  </form>
+</div>
+.login-container {
+  max-width: 400px;
+  margin: 100px auto;
+  padding: 40px;
+  background: linear-gradient(135deg, #1a1f3a 0%, #0a0e27 100%);
+  border-radius: 12px;
+  border: 2px solid #00ffff;
+}
+
+.login-container h2 {
+  color: #00ffff;
+  font-family: 'Orbitron', sans-serif;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  color: #e5e7eb;
+  margin-bottom: 8px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  background: #1f1f2e;
+  border: 1px solid #00ffff;
+  border-radius: 4px;
+  color: #e5e7eb;
+  font-size: 16px;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  background: #00ffff;
+  color: #0a0a0f;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.error {
+  color: #ff0000;
+  text-align: center;
+}
+
+.register-link {
+  text-align: center;
+  margin-top: 20px;
+  color: #9ca3af;
+}
+
+.register-link a {
+  color: #00ffff;
+  text-decoration: none;
+}
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'app-login',
+  standalone: true,
+  imports: [FormsModule, CommonModule],
+  templateUrl: './login.html',
+  styleUrl: './login.css',
+})
+export class Login {
+  username = '';
+  password = '';
+  error = '';
+
+  constructor(private router: Router, private http: HttpClient) {}
+
+  onSubmit() {
+  this.http.post('http://localhost:3000/api/login', {
+    username: this.username,
+    password: this.password
+  }).subscribe({
+    next: (res: any) => {
+      localStorage.setItem('token', res.token);
+      localStorage.setItem('username', res.user.username);  // ✅ res.user.username
+      localStorage.setItem('role', res.user.role);          // ✅ res.user.role
+
+      console.log('✅ Logged in as:', res.user);
+      this.router.navigate(['/home']);
+    },
+    error: (err) => {
+      this.error = err.error.error || 'Login failed';
+    }
+  });
+}
+}
+.register-container {
+  max-width: 400px;
+  margin: 100px auto;
+  padding: 40px;
+  background: linear-gradient(135deg, #1a1f3a 0%, #0a0e27 100%);
+  border-radius: 12px;
+  border: 2px solid #00ffff;
+}
+
+.register-container h2 {
+  color: #00ffff;
+  font-family: 'Orbitron', sans-serif;
+  text-align: center;
+  margin-bottom: 30px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  color: #e5e7eb;
+  margin-bottom: 8px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  background: #1f1f2e;
+  border: 1px solid #00ffff;
+  border-radius: 4px;
+  color: #e5e7eb;
+  font-size: 16px;
+}
+
+button {
+  width: 100%;
+  padding: 12px;
+  background: #00ffff;
+  color: #0a0a0f;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.error {
+  color: #ff0000;
+  text-align: center;
+  margin: 10px 0;
+}
+
+.success {
+  color: #00ff00;
+  text-align: center;
+  margin: 10px 0;
+}
+
+.login-link {
+  text-align: center;
+  margin-top: 20px;
+  color: #9ca3af;
+}
+
+.login-link a {
+  color: #00ffff;
+  text-decoration: none;
+}
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { Router, RouterLink } from '@angular/router';
+import { HttpClient } from '@angular/common/http';
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'app-register',
+  standalone: true,
+  imports: [FormsModule, CommonModule, RouterLink],
+  templateUrl: './register.html',
+  styleUrl: './register.css',
+})
+export class Register {
+  username = '';
+  password = '';
+  confirmPassword = '';
+  error = '';
+  success = '';
+
+  constructor(private router: Router, private http: HttpClient) {}
+
+  onSubmit() {
+    if (this.password !== this.confirmPassword) {
+      this.error = 'Passwords do not match';
+      return;
+    }
+
+    this.http.post('http://localhost:3000/api/register', {
+      username: this.username,
+      password: this.password,
+    }).subscribe({
+      next: (res: any) => {
+        this.success = 'Registration successful! Redirecting...';
+        setTimeout(() => {
+          this.router.navigate(['/login']);
+        }, 2000);
+      },
+      error: (err) => {
+        this.error = err.error.error || 'Registration failed';
+      }
+    });
+  }
+}
+<div class="register-container">
+  <h2>Register</h2>
+
+  <form (ngSubmit)="onSubmit()">
+    <div class="form-group">
+      <label>Username</label>
+      <input [(ngModel)]="username" name="username" type="text" required>
+    </div>
+
+    <div class="form-group">
+      <label>Password</label>
+      <input [(ngModel)]="password" name="password" type="password" required>
+    </div>
+
+    <div class="form-group">
+      <label>Confirm Password</label>
+      <input [(ngModel)]="confirmPassword" name="confirmPassword" type="password" required>
+    </div>
+
+
+
+    <p *ngIf="error" class="error">{{ error }}</p>
+    <p *ngIf="success" class="success">{{ success }}</p>
+
+    <button type="submit">Register</button>
+
+    <p class="login-link">
+      Already have an account? <a routerLink="/login">Login</a>
+    </p>
+  </form>
+</div>
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { PostService, Post, Comment } from '../../service/post';
+
+@Component({
+  selector: 'app-post-detail',
+  standalone: true,
+  imports: [
+    CommonModule,
+    FormsModule,
+    RouterLink,
+    MatIconModule,
+    MatButtonModule,
+    MatFormFieldModule,
+    MatInputModule
+  ],
+  templateUrl: './post-detail.component.html',
+  styleUrls: ['./post-detail.component.css']
+})
+export class PostDetailComponent implements OnInit {
+  post: Post | null = null;
+  comments: Comment[] = [];
+  newComment = '';
+  loading = true;
+  error = '';
+  liked = false;
+  
+  constructor(
+    private route: ActivatedRoute,
+    private router: Router,
+    private postService: PostService
+  ) {}
+
+  ngOnInit() {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.loadPost(parseInt(id));
+      this.loadComments(parseInt(id));
+      this.checkIfLiked(parseInt(id));
+    }
+  }
+
+  loadPost(id: number) {
+    this.postService.getPostById(id).subscribe({
+      next: (data: Post) => {
+        this.post = data;
+        this.loading = false;
+      },
+      error: (err: any) => {
+        console.error(err);
+        this.error = 'Post not found';
+        this.loading = false;
+      }
+    });
+  }
+
+  loadComments(id: number) {
+    this.postService.getComments(id).subscribe({
+      next: (data: Comment[]) => {
+        this.comments = data;
+      },
+      error: (err: any) => {
+        console.error(err);
+      }
+    });
+  }
+
+  checkIfLiked(id: number) {
+    if (!this.isLoggedIn()) return;
+    
+    this.postService.checkIfLiked(id).subscribe({
+      next: (data: { liked: boolean }) => {
+        this.liked = data.liked;
+      },
+      error: () => {}
+    });
+  }
+
+  toggleLike() {
+    if (!this.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+    if (!this.post) return;
+
+    this.postService.toggleLike(this.post.id).subscribe({
+      next: (data: { liked: boolean; likes: number }) => {
+        this.liked = data.liked;
+        if (this.post) this.post.likes = data.likes;
+      },
+      error: (err: any) => console.error(err)
+    });
+  }
+
+  addComment() {
+    if (!this.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return;
+    }
+    if (!this.post || !this.newComment.trim()) return;
+
+    this.postService.addComment(this.post.id, this.newComment).subscribe({
+      next: (comment: Comment) => {
+        this.comments.unshift(comment);
+        this.newComment = '';
+        if (this.post) this.post.comment_count = (this.post.comment_count || 0) + 1;
+      },
+      error: () => alert('Failed to add comment')
+    });
+  }
+
+  deleteComment(commentId: number) {
+    if (!confirm('Delete this comment?')) return;
+
+    this.postService.deleteComment(commentId).subscribe({
+      next: () => {
+        this.comments = this.comments.filter(c => c.id !== commentId);
+        if (this.post) this.post.comment_count = (this.post.comment_count || 1) - 1;
+      },
+      error: () => alert('Failed to delete comment')
+    });
+  }
+
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('token');
+  }
+
+  getUsername(): string {
+    return localStorage.getItem('username') || '';
+  }
+
+  isAdmin(): boolean {
+    return localStorage.getItem('role') === 'admin';
+  }
+
+  canDeleteComment(comment: Comment): boolean {
+    return this.isAdmin() || comment.author === this.getUsername();
+  }
+
+  goBack() {
+    this.router.navigate(['/explore']);
+  }
+
+  formatDate(timestamp: string | undefined): string {
+    if (!timestamp) return 'Unknown date';
+    const date = new Date(timestamp);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    });
+  }
+}
+<div class="post-detail-container">
+  <div *ngIf="loading" class="loading"><p>Loading...</p></div>
+  <div *ngIf="error" class="error">
+    <p>{{ error }}</p>
+    <button mat-raised-button (click)="goBack()">Go Back</button>
+  </div>
+
+  <div *ngIf="!loading && !error && post" class="post-content">
+    <button mat-button class="back-btn" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon> Back
+    </button>
+
+    <div class="post-header">
+      <span class="category">{{ post.category }}</span>
+      <span class="date">{{ formatDate(post.created_at) }}</span>
+    </div>
+
+    <h1 class="post-title">{{ post.title }}</h1>
+
+    <div class="post-meta">
+      <span class="author">By {{ post.author }}</span>
+      <div class="stats">
+        <span><mat-icon>visibility</mat-icon> {{ post.views || 0 }}</span>
+        <span><mat-icon>thumb_up</mat-icon> {{ post.likes || 0 }}</span>
+        <span><mat-icon>comment</mat-icon> {{ post.comment_count || 0 }}</span>
+      </div>
+    </div>
+
+    <div class="post-body"><p>{{ post.body }}</p></div>
+
+    <div class="action-bar">
+      <button mat-raised-button [color]="liked ? 'accent' : 'primary'" (click)="toggleLike()">
+        <mat-icon>{{ liked ? 'thumb_up' : 'thumb_up_off_alt' }}</mat-icon>
+        {{ liked ? 'Liked' : 'Like' }} ({{ post.likes || 0 }})
+      </button>
+    </div>
+
+    <div class="comments-section">
+      <h2>Comments ({{ post.comment_count || 0 }})</h2>
+
+      <div *ngIf="isLoggedIn()" class="add-comment">
+        <mat-form-field class="full-width">
+          <mat-label>Add a comment</mat-label>
+          <textarea matInput [(ngModel)]="newComment" rows="3"></textarea>
+        </mat-form-field>
+        <button mat-raised-button color="primary" (click)="addComment()" [disabled]="!newComment.trim()">
+          Post Comment
+        </button>
+      </div>
+
+      <div *ngIf="!isLoggedIn()" class="login-prompt">
+        <p>Please <a routerLink="/login">login</a> to comment</p>
+      </div>
+
+      <div class="comments-list">
+        <div *ngFor="let comment of comments" class="comment-card">
+          <div class="comment-header">
+            <span class="comment-author">{{ comment.author }}</span>
+            <span class="comment-date">{{ formatDate(comment.created_at) }}</span>
+          </div>
+          <p class="comment-body">{{ comment.body }}</p>
+          <button *ngIf="canDeleteComment(comment)" mat-button color="warn" (click)="deleteComment(comment.id)">
+            <mat-icon>delete</mat-icon> Delete
+          </button>
+        </div>
+        <div *ngIf="comments.length === 0" class="no-comments">
+          <p>No comments yet.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+.post-detail-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.loading, .error {
+  text-align: center;
+  padding: 60px;
+  color: #00ffff;
+}
+
+.back-btn {
+  color: #00ffff !important;
+  margin-bottom: 20px;
+}
+
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.category {
+  background: #00ffff20;
+  color: #00ffff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  border: 1px solid #00ffff;
+}
+
+.post-title {
+  color: #00ffff;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+}
+
+.post-meta {
+  display: flex;
+  justify-content: space-between;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #00ffff40;
+  margin-bottom: 30px;
+}
+
+.stats {
+  display: flex;
+  gap: 20px;
+  color: #9ca3af;
+}
+
+.stats span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.post-body {
+  background: #1a1f3a;
+  padding: 30px;
+  border-radius: 12px;
+  border: 2px solid #00ffff40;
+  margin-bottom: 30px;
+  line-height: 1.8;
+  color: #e5e7eb;
+}
+
+.action-bar {
+  margin-bottom: 40px;
+}
+
+.comments-section h2 {
+  color: #00ffff;
+  font-family: 'Orbitron', sans-serif;
+  margin-bottom: 30px;
+}
+
+.add-comment {
+  background: #1a1f3a;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 30px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.login-prompt {
+  text-align: center;
+  padding: 30px;
+  background: #1a1f3a;
+  border-radius: 12px;
+}
+
+.login-prompt a {
+  color: #00ffff;
+}
+
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.comment-card {
+  background: #1a1f3a;
+  padding: 20px;
+  border-radius: 12px;
+  border: 2px solid #00ffff20;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.comment-author {
+  color: #00ffff;
+  font-weight: bold;
+}
+
+.comment-body {
+  color: #e5e7eb;
+  line-height: 1.6;
+}
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { PostDetailComponent } from './post-detail.component';
+
+describe('PostDetailComponent', () => {
+  let component: PostDetailComponent;
+  let fixture: ComponentFixture<PostDetailComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [PostDetailComponent]
+    }).compileComponents();
+
+    fixture = TestBed.createComponent(PostDetailComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+.substance-detail-container {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.loading, .error {
+  text-align: center;
+  padding: 60px;
+  color: #00ffff;
+  font-size: 1.2rem;
+}
+
+.error {
+  color: #ff6b6b;
+}
+
+.back-btn {
+  color: #00ffff !important;
+  margin-bottom: 30px;
+}
+
+.substance-header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 40px;
+  background: linear-gradient(135deg, #1a1f3a 0%, #0a0e27 100%);
+  border-radius: 12px;
+  border: 2px solid #00ffff;
+}
+
+.substance-image {
+  width: 200px;
+  height: 200px;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  border: 3px solid #00ffff;
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.5);
+  object-fit: cover;
+}
+
+.substance-name {
+  color: #00ffff;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+}
+
+.molecular-name {
+  color: #9ca3af;
+  font-size: 1.2rem;
+  font-style: italic;
+  margin-bottom: 10px;
+}
+
+.formula {
+  color: #00ffff;
+  font-family: 'Courier New', monospace;
+  font-size: 1.3rem;
+  margin-bottom: 20px;
+  padding: 10px 20px;
+  background: #1f1f2e;
+  border-radius: 8px;
+  display: inline-block;
+}
+
+.aka-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+}
+
+.aka-tag {
+  background: #00ffff20;
+  color: #00ffff;
+  padding: 5px 15px;
+  border-radius: 20px;
+  border: 1px solid #00ffff;
+  font-size: 0.9rem;
+}
+
+.description {
+  color: #e5e7eb;
+  line-height: 1.8;
+  font-size: 1.1rem;
+  margin-bottom: 30px;
+  padding: 20px;
+  background: #1a1f3a;
+  border-radius: 8px;
+  border-left: 4px solid #00ffff;
+}
+
+/* Tabs styling */
+::ng-deep .mat-mdc-tab-group {
+  margin-top: 30px;
+}
+
+::ng-deep .mat-mdc-tab {
+  color: #9ca3af !important;
+}
+
+::ng-deep .mat-mdc-tab.mdc-tab--active {
+  color: #00ffff !important;
+}
+
+::ng-deep .mat-mdc-tab-body-content {
+  padding: 30px 0;
+}
+
+::ng-deep .mdc-tab-indicator__content--underline {
+  border-color: #00ffff !important;
+}
+
+.info-section {
+  background: #1a1f3a;
+  padding: 30px;
+  border-radius: 12px;
+  border: 2px solid #00ffff40;
+  margin-bottom: 20px;
+}
+
+.info-section h3 {
+  color: #00ffff;
+  font-family: 'Orbitron', sans-serif;
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+}
+
+.effects-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 15px;
+}
+
+.effect-item {
+  background: #0a0e27;
+  padding: 15px;
+  border-radius: 8px;
+  border-left: 3px solid #00ffff;
+  color: #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.effect-item mat-icon {
+  color: #00ffff;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.dosage-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.dosage-table tr {
+  border-bottom: 1px solid #00ffff20;
+}
+
+.dosage-table td {
+  padding: 15px 10px;
+  color: #e5e7eb;
+}
+
+.dosage-table td:first-child {
+  color: #00ffff;
+  font-weight: bold;
+  width: 30%;
+}
+
+.duration-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+}
+
+.duration-card {
+  background: #0a0e27;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  border: 2px solid #00ffff40;
+}
+
+.duration-card h4 {
+  color: #00ffff;
+  margin-bottom: 10px;
+  font-size: 1.1rem;
+}
+
+.duration-card p {
+  color: #e5e7eb;
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.safety-list {
+  list-style: none;
+  padding: 0;
+}
+
+.safety-list li {
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  background: #0a0e27;
+  border-radius: 8px;
+  border-left: 3px solid #00ffff;
+  color: #e5e7eb;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.safety-list li mat-icon {
+  color: #00ffff;
+  font-size: 20px;
+  width: 20px;
+  height: 20px;
+}
+
+.warning-item {
+  border-left-color: #ff6b6b !important;
+}
+
+.warning-item mat-icon {
+  color: #ff6b6b !important;
+}
+
+.interaction-item {
+  padding: 12px 15px;
+  margin-bottom: 10px;
+  background: #0a0e27;
+  border-radius: 8px;
+  color: #e5e7eb;
+}
+
+.interaction-item.dangerous {
+  border-left: 3px solid #ff0000;
+}
+
+.interaction-item.caution {
+  border-left: 3px solid #ffa500;
+}
+
+.interaction-item.safe {
+  border-left: 3px solid #00ff00;
+}
+
+.disclaimer {
+  background: #ff000020;
+  border: 2px solid #ff6b6b;
+  padding: 20px;
+  border-radius: 8px;
+  margin-top: 30px;
+  color: #ff6b6b;
+  text-align: center;
+}
+
+.disclaimer h4 {
+  color: #ff0000;
+  margin-bottom: 10px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .substance-name {
+    font-size: 2rem;
+  }
+
+  .effects-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .duration-grid {
+    grid-template-columns: 1fr;
+  }
+}
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { SubstancesDetail } from './substances-detail';
+
+describe('SubstancesDetail', () => {
+  let component: SubstancesDetail;
+  let fixture: ComponentFixture<SubstancesDetail>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [SubstancesDetail]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(SubstancesDetail);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatCardModule } from '@angular/material/card';
+import { MatTabsModule } from '@angular/material/tabs';
+
+interface Substance {
+  id: number;
+  name: string;
+  molecularName: string;
+  formula: string;
+  alsoKnownAs: string[];
+  image: string;
+  description?: string;
+  effects?: string[];
+  dosage?: {
+    threshold?: string;
+    light?: string;
+    common?: string;
+    strong?: string;
+    heavy?: string;
+  };
+  duration?: {
+    onset?: string;
+    comeup?: string;
+    peak?: string;
+    offset?: string;
+    total?: string;
+  };
+  safetyInfo?: string[];
+  interactions?: string[];
+}
+
+@Component({
+  selector: 'app-substance-detail',
+  standalone: true,
+  imports: [
+    CommonModule,
+    RouterLink,
+    MatButtonModule,
+    MatIconModule,
+    MatCardModule,
+    MatTabsModule
+  ],
+  templateUrl: './substance-detail.html',
+  styleUrls: ['./substance-detail.css']
+})
+export class SubstanceDetailComponent implements OnInit {
+  substance: Substance | null = null;
+  loading = true;
+  error = '';
+
+  // Database completo sostanze
+  private substances: Substance[] = [
+    {
+      id: 1,
+      name: 'DMT',
+      molecularName: 'N,N-Dimethyltryptamine',
+      formula: 'C₁₂H₁₆N₂',
+        alsoKnownAs: ['Dimethyltryptamine', 'Dimitri', 'Businessman\'s Trip', 'Spirit Molecule'],
+        image: 'assets/dmt.png',
+        description: 'DMT is a powerful psychedelic compound that occurs naturally in many plants and animals. Known for producing intense, short-lived visual and auditory hallucinations.',
+        effects: [
+          'Intense visual hallucinations',
+          'Altered perception of time and space',
+          'Ego dissolution',
+          'Spiritual/mystical experiences',
+          'Auditory distortions',
+          'Body sensations'
+        ],
+        dosage: {
+          threshold: '5-10 mg (vaporized)',
+          light: '10-20 mg',
+          common: '20-40 mg',
+          strong: '40-60 mg',
+          heavy: '60+ mg'
+        },
+        duration: {
+          onset: '0-2 minutes',
+          comeup: '0-2 minutes',
+          peak: '2-5 minutes',
+          offset: '5-10 minutes',
+          total: '10-20 minutes'
+        },
+        safetyInfo: [
+          'Generally considered physically safe',
+          'May cause psychological distress in unprepared users',
+          'Not recommended for those with psychotic disorders',
+          'Ensure a safe, comfortable environment',
+          'Have a trusted sitter present'
+        ],
+        interactions: [
+          '⚠️ DANGEROUS: MAOIs (can cause serotonin syndrome)',
+          '⚠️ CAUTION: SSRIs and other antidepressants',
+          '⚠️ CAUTION: Stimulants (increased anxiety)',
+          '✓ Generally safe: Cannabis (but may intensify experience)'
+        ]
+    },
+    {
+      id: 2,
+      name: 'LSD',
+      molecularName: 'Lysergic Acid Diethylamide',
+      formula: 'C₂₀H₂₅N₃O',
+        alsoKnownAs: ['Acid', 'Lucy', 'Tabs', 'Blotter'],
+        image: 'assets/lsd.png',
+        description: 'LSD is a semi-synthetic psychedelic known for its profound effects on consciousness, perception, and cognition. It\'s one of the most potent psychoactive substances known.',
+        effects: [
+          'Visual hallucinations and distortions',
+          'Enhanced pattern recognition',
+          'Synesthesia',
+          'Altered sense of time',
+          'Profound introspection',
+          'Emotional amplification',
+          'Enhanced creativity'
+        ],
+        dosage: {
+          threshold: '10-20 μg',
+          light: '25-75 μg',
+          common: '75-150 μg',
+          strong: '150-300 μg',
+          heavy: '300+ μg'
+        },
+        duration: {
+          onset: '20-60 minutes',
+          comeup: '30-90 minutes',
+          peak: '3-5 hours',
+          offset: '3-5 hours',
+          total: '8-12 hours'
+        },
+        safetyInfo: [
+          'Physically safe, no known lethal dose',
+          'Psychological risks for unprepared users',
+          'May trigger latent mental health issues',
+          'Test your substance (many RC\'s sold as LSD)',
+          'Set and setting are crucial',
+          'Avoid if family history of schizophrenia'
+        ],
+        interactions: [
+          '⚠️ CAUTION: Lithium (increased risk of seizures)',
+          '⚠️ CAUTION: Tramadol (lowered seizure threshold)',
+          '✓ Generally safe: Cannabis',
+          '✓ Synergistic: Psilocybin, DMT'
+        ]
+    },
+    {
+      id: 3,
+      name: 'Psilocybin',
+      molecularName: '4-phosphoryloxy-N,N-dimethyltryptamine',
+      formula: 'C₁₂H₁₇N₂O₄P',
+        alsoKnownAs: ['Magic Mushrooms', 'Shrooms', 'Psilocin', 'Mushrooms'],
+        image: 'assets/psilocibina.png',
+        description: 'Psilocybin is a naturally occurring psychedelic prodrug found in over 200 species of mushrooms. It converts to psilocin in the body and has been used for centuries in spiritual practices.',
+        effects: [
+          'Visual and auditory hallucinations',
+          'Altered perception of time',
+          'Emotional introspection',
+          'Euphoria and well-being',
+          'Spiritual experiences',
+          'Enhanced appreciation of music and art',
+          'Thought loops'
+        ],
+        dosage: {
+          threshold: '0.25-0.5 g dried',
+          light: '0.5-1 g',
+          common: '1-2.5 g',
+          strong: '2.5-4 g',
+          heavy: '4+ g'
+        },
+        duration: {
+          onset: '20-40 minutes',
+          comeup: '30-60 minutes',
+          peak: '2-3 hours',
+          offset: '2-3 hours',
+          total: '4-7 hours'
+        },
+        safetyInfo: [
+          'Very low toxicity',
+          'Non-addictive',
+          'Psychological risks in unsuitable environment',
+          'Nausea common during come-up',
+          'Ensure proper mushroom identification',
+          'Not recommended for those with psychotic disorders'
+        ],
+        interactions: [
+          '⚠️ CAUTION: SSRIs (may reduce effects)',
+          '⚠️ CAUTION: Lithium (seizure risk)',
+          '✓ Generally safe: Cannabis',
+          '✓ Synergistic: LSD, DMT'
+        ]
+    },
+    {
+      id: 4,
+      name: 'MDMA',
+      molecularName: '3,4-Methylenedioxymethamphetamine',
+      formula: 'C₁₁H₁₅NO₂',
+        alsoKnownAs: ['Ecstasy', 'Molly', 'E', 'XTC', 'Mandy'],
+        image: 'assets/mdma.png',
+        description: 'MDMA is an empathogenic-entactogenic compound known for producing feelings of euphoria, increased empathy, and enhanced sensory perception.',
+        effects: [
+          'Intense euphoria',
+          'Increased empathy and emotional openness',
+          'Enhanced sensory perception',
+          'Increased sociability',
+          'Feelings of love and connection',
+          'Mild visual enhancements',
+          'Increased energy'
+        ],
+        dosage: {
+          threshold: '30-50 mg',
+          light: '50-75 mg',
+          common: '75-125 mg',
+          strong: '125-180 mg',
+          heavy: '180+ mg'
+        },
+        duration: {
+          onset: '30-60 minutes',
+          comeup: '15-30 minutes',
+          peak: '2-3 hours',
+          offset: '1-2 hours',
+          total: '4-6 hours'
+        },
+        safetyInfo: [
+          '⚠️ Risk of hyperthermia - stay hydrated but don\'t overdrink',
+          '⚠️ Neurotoxic at high doses or frequent use',
+          '⚠️ Test your substance (many adulterants)',
+          'Wait at least 3 months between uses',
+          'Avoid in hot environments',
+          'Dangerous for those with heart conditions'
+        ],
+        interactions: [
+          '🔴 DANGEROUS: MAOIs (potentially fatal)',
+          '⚠️ DANGEROUS: SSRIs (serotonin syndrome risk)',
+          '⚠️ CAUTION: Alcohol (increased neurotoxicity)',
+          '⚠️ CAUTION: Stimulants (increased cardiovascular strain)'
+        ]
+    },
+    {
+      id: 5,
+      name: 'Ketamine',
+      molecularName: '(RS)-2-(2-Chlorophenyl)-2-(methylamino)cyclohexanone',
+      formula: 'C₁₃H₁₆ClNO',
+        alsoKnownAs: ['K', 'Ket', 'Special K', 'Kitty', 'Vitamin K'],
+        image: 'assets/ketamine.png',
+        description: 'Ketamine is a dissociative anesthetic used medically and recreationally. It produces feelings of detachment from the body and can induce a trance-like state.',
+        effects: [
+          'Dissociation from body',
+          'Visual and auditory distortions',
+          'Altered perception of time and space',
+          'Out-of-body experiences (K-hole at high doses)',
+          'Anesthetic/numbing effects',
+          'Dream-like states',
+          'Motor impairment'
+        ],
+        dosage: {
+          threshold: '10-20 mg (insufflated)',
+          light: '20-50 mg',
+          common: '50-100 mg',
+          strong: '100-150 mg',
+          heavy: '150+ mg (K-hole territory)'
+        },
+        duration: {
+          onset: '5-10 minutes (insufflated)',
+          comeup: '5-10 minutes',
+          peak: '45-90 minutes',
+          offset: '45-90 minutes',
+          total: '2-3 hours'
+        },
+        safetyInfo: [
+          '⚠️ Risk of bladder damage with chronic use',
+          '⚠️ Risk of injury due to impaired motor function',
+          'Lie down in safe environment',
+          'Never combine with CNS depressants',
+          'Can be psychologically addictive',
+          'May cause nausea'
+        ],
+        interactions: [
+          '🔴 DANGEROUS: Alcohol and CNS depressants (respiratory depression)',
+          '🔴 DANGEROUS: Benzodiazepines (blackout risk)',
+          '⚠️ CAUTION: Stimulants (cardiovascular strain)',
+          '⚠️ CAUTION: Psychedelics (confusing experiences)'
+        ]
+    },
+    {
+      id: 6,
+      name: 'Cannabis',
+      molecularName: 'Delta-9-Tetrahydrocannabinol (THC)',
+      formula: 'C₂₁H₃₀O₂',
+        alsoKnownAs: ['Weed', 'Marijuana', 'Pot', 'Herb', 'Grass', 'Ganja'],
+        image: 'assets/cannabis.png',
+        description: 'Cannabis is a plant containing psychoactive compounds, primarily THC and CBD. It produces relaxation, altered perception, and has various medical applications.',
+        effects: [
+          'Relaxation and euphoria',
+          'Altered time perception',
+          'Enhanced sensory perception',
+          'Increased appetite',
+          'Mild visual enhancements',
+          'Creativity enhancement (subjective)',
+          'Short-term memory impairment'
+        ],
+        dosage: {
+          threshold: '2-5 mg THC (oral)',
+          light: '5-10 mg',
+          common: '10-25 mg',
+          strong: '25-50 mg',
+          heavy: '50+ mg'
+        },
+        duration: {
+          onset: '5-10 minutes (smoked) / 30-90 min (oral)',
+          comeup: '5-10 min (smoked) / 30-60 min (oral)',
+          peak: '1-2 hours (smoked) / 2-4 hours (oral)',
+          offset: '1-2 hours (smoked) / 2-4 hours (oral)',
+          total: '2-4 hours (smoked) / 5-10 hours (oral)'
+        },
+        safetyInfo: [
+          'Generally considered safe',
+          'May cause anxiety or paranoia, especially in high doses',
+          'Not recommended for those with psychotic disorders',
+          'Edibles: start low, go slow (delayed onset)',
+          'Impairs driving ability',
+          'Can be psychologically habit-forming'
+        ],
+        interactions: [
+          '⚠️ CAUTION: Alcohol (increased impairment)',
+          '✓ Synergistic: Psychedelics (can intensify experience)',
+          '✓ Generally safe: Most substances (but may intensify)'
+        ]
+    },
+    {
+      id: 7,
+      name: 'Mescaline',
+      molecularName: '3,4,5-Trimethoxyphenethylamine',
+      formula: 'C₁₁H₁₇NO₃',
+        alsoKnownAs: ['Peyote', 'San Pedro', 'Buttons', 'Cactus'],
+        image: 'assets/mescaline.png',
+        description: 'Mescaline is a naturally occurring psychedelic found in several cacti species. It has been used for thousands of years in Native American spiritual practices.',
+        effects: [
+          'Visual hallucinations with geometric patterns',
+          'Enhanced color perception',
+          'Emotional introspection',
+          'Spiritual experiences',
+          'Enhanced empathy',
+          'Altered sense of time',
+          'Body euphoria'
+        ],
+        dosage: {
+          threshold: '50-100 mg',
+          light: '100-200 mg',
+          common: '200-300 mg',
+          strong: '300-500 mg',
+          heavy: '500+ mg'
+        },
+        duration: {
+          onset: '60-90 minutes',
+          comeup: '60-120 minutes',
+          peak: '4-6 hours',
+          offset: '3-4 hours',
+          total: '10-14 hours'
+        },
+        safetyInfo: [
+          'Generally considered safe physically',
+          'Nausea and vomiting common (especially with cactus preparation)',
+          'Long duration - plan accordingly',
+          'Set and setting important',
+          'Not recommended for those with heart conditions',
+          'Avoid if family history of psychotic disorders'
+        ],
+        interactions: [
+          '⚠️ CAUTION: MAOIs (may potentiate effects)',
+          '⚠️ CAUTION: Tramadol (lowered seizure threshold)',
+          '✓ Synergistic: Other psychedelics',
+          '✓ Generally safe: Cannabis'
+        ]
+    }
+  ];
+
+  constructor(
+    private route: ActivatedRoute,
+      private router: Router
+  ) {}
+
+  ngOnInit() {
+    const id = this.route.snapshot.paramMap.get('id');
+    if (id) {
+      this.loadSubstance(parseInt(id));
+    }
+  }
+
+  loadSubstance(id: number) {
+    setTimeout(() => {
+      this.substance = this.substances.find(s => s.id === id) || null;
+      this.loading = false;
+      if (!this.substance) {
+        this.error = 'Substance not found';
+      }
+    }, 300);
+  }
+
+  goBack() {
+    this.router.navigate(['/substances']);
+  }
+
+  formatDate(timestamp: string | undefined): string {
+    if (!timestamp) return 'Unknown date';
+    const date = new Date(timestamp);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'long',
+      day: 'numeric'
+    });
+  }
+}
+<div class="substance-detail-container">
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading">
+    <p>Loading substance information...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error" class="error">
+    <p>{{ error }}</p>
+    <button mat-raised-button color="primary" (click)="goBack()">Back to Substances</button>
+  </div>
+
+  <!-- Substance Details -->
+  <div *ngIf="!loading && !error && substance">
+    <button mat-button class="back-btn" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon> Back to Substances
+    </button>
+
+    <!-- Header Section -->
+    <div class="substance-header">
+      <img [src]="substance.image" [alt]="substance.name" class="substance-image"
+           onerror="this.src='assets/placeholder.png'">
+      <h1 class="substance-name">{{ substance.name }}</h1>
+      <p class="molecular-name">{{ substance.molecularName }}</p>
+      <div class="formula">{{ substance.formula }}</div>
+
+      <div class="aka-list">
+        <span *ngFor="let aka of substance.alsoKnownAs" class="aka-tag">
+          {{ aka }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="description">
+      {{ substance.description }}
+    </div>
+
+    <!-- Tabbed Content -->
+    <mat-tab-group>
+      <!-- Effects Tab -->
+      <mat-tab label="Effects">
+        <div class="info-section">
+          <h3>Common Effects</h3>
+          <div class="effects-grid">
+            <div *ngFor="let effect of substance.effects" class="effect-item">
+              <mat-icon>check_circle</mat-icon>
+              <span>{{ effect }}</span>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Dosage Tab -->
+      <mat-tab label="Dosage">
+        <div class="info-section">
+          <h3>Dosage Information</h3>
+          <p style="color: #9ca3af; margin-bottom: 20px;">
+            <mat-icon style="vertical-align: middle; color: #ffa500;">warning</mat-icon>
+            Start with lower doses. Individual sensitivity varies greatly.
+          </p>
+          <table class="dosage-table">
+            <tr *ngIf="substance.dosage?.threshold">
+              <td>Threshold</td>
+              <td>{{ substance.dosage.threshold }}</td>
+            </tr>
+            <tr *ngIf="substance.dosage?.light">
+              <td>Light</td>
+              <td>{{ substance.dosage.light }}</td>
+            </tr>
+            <tr *ngIf="substance.dosage?.common">
+              <td>Common</td>
+              <td>{{ substance.dosage.common }}</td>
+            </tr>
+            <tr *ngIf="substance.dosage?.strong">
+              <td>Strong</td>
+              <td>{{ substance.dosage.strong }}</td>
+            </tr>
+            <tr *ngIf="substance.dosage?.heavy">
+              <td>Heavy</td>
+              <td>{{ substance.dosage.heavy }}</td>
+            </tr>
+          </table>
+        </div>
+      </mat-tab>
+
+      <!-- Duration Tab -->
+      <mat-tab label="Duration">
+        <div class="info-section">
+          <h3>Duration Timeline</h3>
+          <div class="duration-grid">
+            <div *ngIf="substance.duration?.onset" class="duration-card">
+              <h4>Onset</h4>
+              <p>{{ substance.duration.onset }}</p>
+            </div>
+            <div *ngIf="substance.duration?.comeup" class="duration-card">
+              <h4>Come Up</h4>
+              <p>{{ substance.duration.comeup }}</p>
+            </div>
+            <div *ngIf="substance.duration?.peak" class="duration-card">
+              <h4>Peak</h4>
+              <p>{{ substance.duration.peak }}</p>
+            </div>
+            <div *ngIf="substance.duration?.offset" class="duration-card">
+              <h4>Offset</h4>
+              <p>{{ substance.duration.offset }}</p>
+            </div>
+            <div *ngIf="substance.duration?.total" class="duration-card">
+              <h4>Total Duration</h4>
+              <p>{{ substance.duration.total }}</p>
+            </div>
+          </div>
+        </div>
+      </mat-tab>
+
+      <!-- Safety Tab -->
+      <mat-tab label="Safety">
+        <div class="info-section">
+          <h3>Safety Information</h3>
+          <ul class="safety-list">
+            <li *ngFor="let info of substance.safetyInfo"
+                [class.warning-item]="info.includes('⚠️')">
+              <mat-icon>{{ info.includes('⚠️') ? 'warning' : 'info' }}</mat-icon>
+              <span>{{ info.replace('⚠️', '').trim() }}</span>
+            </li>
+          </ul>
+        </div>
+      </mat-tab>
+
+      <!-- Interactions Tab -->
+      <mat-tab label="Interactions">
+        <div class="info-section">
+          <h3>Drug Interactions</h3>
+          <div *ngFor="let interaction of substance.interactions"
+               class="interaction-item"
+               [class.dangerous]="interaction.includes('🔴') || interaction.includes('DANGEROUS')"
+               [class.caution]="interaction.includes('⚠️') || interaction.includes('CAUTION')"
+               [class.safe]="interaction.includes('✓')">
+            {{ interaction }}
+          </div>
+        </div>
+      </mat-tab>
+    </mat-tab-group>
+
+    <!-- Disclaimer -->
+    <div class="disclaimer">
+      <h4>⚠️ IMPORTANT DISCLAIMER</h4>
+      <p>
+        This information is for educational purposes only. Always research substances thoroughly,
+        test your substances, start with lower doses, and prioritize harm reduction.
+        The safest option is always to not use substances at all. If you choose to use,
+        be informed and stay safe.
+      </p>
+    </div>
+  </div>
+</div>
+import { TestBed } from '@angular/core/testing';
+
+import { Post } from './post';
+
+describe('Post', () => {
+  let service: Post;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(Post);
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+});
+import { TestBed } from '@angular/core/testing';
+
+import { AuthService } from './auth.service';
+
+describe('AuthService', () => {
+  let service: AuthService;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({});
+    service = TestBed.inject(AuthService);
+  });
+
+  it('should be created', () => {
+    expect(service).toBeTruthy();
+  });
+});
+
+import { Injectable } from '@angular/core';
+
+@Injectable({
+  providedIn: 'root'
+})
+export class AuthService {
+
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('token');
+  }
+
+  getRole(): string {
+    return localStorage.getItem('role') || '';
+  }
+
+  isAdmin(): boolean {
+    return this.getRole() === 'admin';
+  }
+
+  getUsername(): string {
+    return localStorage.getItem('username') || '';
+  }
+
+  logout() {
+    localStorage.clear();
+  }
+}
+
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Observable } from 'rxjs';
+
+export interface Post {
+  id: number;
+  user_id?: number;
+  title: string;
+  body: string;
+  category?: string;
+  author: string;
+  created_at?: string;
+  likes?: number;
+  views?: number;
+  comment_count?: number;
+}
+
+export interface Comment {
+  id: number;
+  post_id: number;
+  user_id: number;
+  author: string;
+  body: string;
+  created_at: string;
+}
+
+@Injectable({
+  providedIn: 'root',
+})
+export class PostService {
+  private apiUrl = 'http://localhost:3000/api/posts';
+
+  constructor(private http: HttpClient) {}
+
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token');
+    return new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    });
+  }
+
+  getAllPost(): Observable<Post[]> {
+    return this.http.get<Post[]>(this.apiUrl);
+  }
+
+  getPostById(id: number): Observable<Post> {
+    return this.http.get<Post>(`${this.apiUrl}/${id}`);
+  }
+
+  createPost(post: Post): Observable<Post> {
+    return this.http.post<Post>(this.apiUrl, post, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  deletePost(id: number): Observable<any> {
+    return this.http.delete(`${this.apiUrl}/${id}`, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  toggleLike(postId: number): Observable<{ liked: boolean; likes: number }> {
+    return this.http.post<{ liked: boolean; likes: number }>(
+      `${this.apiUrl}/${postId}/like`,
+      {},
+      { headers: this.getAuthHeaders() }
+    );
+  }
+
+  checkIfLiked(postId: number): Observable<{ liked: boolean }> {
+    return this.http.get<{ liked: boolean }>(
+      `${this.apiUrl}/${postId}/liked`,
+      { headers: this.getAuthHeaders() }
+    );
+  }
+
+  getComments(postId: number): Observable<Comment[]> {
+    return this.http.get<Comment[]>(`${this.apiUrl}/${postId}/comments`);
+  }
+
+  addComment(postId: number, body: string): Observable<Comment> {
+    return this.http.post<Comment>(
+      `${this.apiUrl}/${postId}/comments`,
+      { body },
+      { headers: this.getAuthHeaders() }
+    );
+  }
+
+  deleteComment(commentId: number): Observable<any> {
+    return this.http.delete(
+      `http://localhost:3000/api/comments/${commentId}`,
+      { headers: this.getAuthHeaders() }
+    );
+  }
+}
+
+import { ApplicationConfig } from '@angular/core';
+import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
+import { provideRouter } from '@angular/router';
+import { routes } from './app.routes';
+import { provideHttpClient } from '@angular/common/http';
+
+export const appConfig: ApplicationConfig = {
+  providers: [
+    provideAnimationsAsync(),
+    provideRouter(routes),
+    provideHttpClient()
+  ]
+};
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { SubmitExperience } from './submit-experience';
+
+describe('SubmitExperience', () => {
+  let component: SubmitExperience;
+  let fixture: ComponentFixture<SubmitExperience>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [SubmitExperience]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(SubmitExperience);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+<div class="submit-container">
+  <h2>Submit Experience</h2>
+
+  <form class="experience-form" #form="ngForm" (ngSubmit)="submitExperience(form)">
+
+    <!-- Title -->
+    <mat-form-field class="full-width">
+      <mat-label>Title</mat-label>
+      <input matInput [(ngModel)]="title" name="title" required #titleField="ngModel">
+      <mat-error *ngIf="titleField.invalid && titleField.touched">Title is required</mat-error>
+    </mat-form-field>
+
+    <!-- ✅ CATEGORY DROPDOWN -->
+    <mat-form-field class="full-width">
+      <mat-label>Category</mat-label>
+      <mat-select [(ngModel)]="category" name="category" required #categoryField="ngModel">
+        <mat-option value="Psychedelics">Psychedelics</mat-option>
+        <mat-option value="Dissociatives">Dissociatives</mat-option>
+        <mat-option value="Combo">Combo</mat-option>
+        <mat-option value="Meditation">Meditation</mat-option>
+        <mat-option value="Oneiric">Oneiric (Dreams)</mat-option>
+        <mat-option value="Stimulants">Stimulants</mat-option>
+        <mat-option value="Depressants">Depressants</mat-option>
+        <mat-option value="Other">Other</mat-option>
+      </mat-select>
+      <mat-error *ngIf="categoryField.invalid && categoryField.touched">Category is required</mat-error>
+    </mat-form-field>
+
+    <!-- Experience Description -->
+    <mat-form-field class="full-width">
+      <mat-label>Experience Description</mat-label>
+      <textarea matInput [(ngModel)]="body" name="body" rows="10" required #bodyField="ngModel"></textarea>
+      <mat-error *ngIf="bodyField.invalid && bodyField.touched">Description is required</mat-error>
+    </mat-form-field>
+
+    <!-- Submit Button -->
+    <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
+      Submit
+    </button>
+  </form>
+</div>
+
+.submit-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px;
+}
+
+.experience-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.full-width {
+  width: 100%;
+.submit-container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px;
+}
+
+.experience-form {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+/* Stili per messaggi */
+.error-message {
+  background: #ff000020;
+  border: 1px solid #ff0000;
+  color: #ff6b6b;
+  padding: 12px;
+  border-radius: 4px;
+  text-align: center;
+  margin: 0;
+}
+
+.success-message {
+  background: #00ff0020;
+  border: 1px solid #00ff00;
+  color: #00ffff;
+  padding: 12px;
+  border-radius: 4px;
+  text-align: center;
+  margin: 0;
+}
+
+/* ✅ Personalizzazione dropdown Material */
+::ng-deep .mat-mdc-select-panel {
+  background: #1a1f3a !important;
+  border: 2px solid #00ffff;
+  border-radius: 8px;
+}
+
+::ng-deep .mat-mdc-option {
+  color: #e5e7eb !important;
+}
+
+::ng-deep .mat-mdc-option:hover {
+  background: #2a2f4a !important;
+  color: #00ffff !important;
+}
+
+::ng-deep .mat-mdc-option.mat-mdc-option-active {
+  background: #2a2f4a !important;
+  color: #00ffff !important;
+}
+
+::ng-deep .mat-mdc-select-value {
+  color: #e5e7eb !important;
+}
+
+::ng-deep .mat-mdc-select-arrow {
+  color: #00ffff !important;
+}}
+import { Component } from '@angular/core';
+import { MatInputModule } from '@angular/material/input';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatSelectModule } from '@angular/material/select';  // ← AGGIUNGI
+import { FormsModule } from '@angular/forms';
+import { PostService, Post } from '../service/post';
+import { MatButtonModule } from '@angular/material/button';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'submit-experience',
+  styleUrls: ['submit-experience.css'],
+  templateUrl: 'submit-experience.html',
+  standalone: true,
+  imports: [
+    FormsModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSelectModule,
+    MatButtonModule,
+    CommonModule
+  ],
+})
+export class SubmitExperienceComponent {
+  title = '';
+  category = '';
+  body = '';
+  error = '';
+  success = '';
+
+  // ✅ Opzionale: definisci le categorie in un array
+categories = [
+  { value: 'Psychedelics', label: '🍄 Psychedelics' },
+  { value: 'Dissociatives', label: '🌀 Dissociatives' },
+  { value: 'Combo', label: '🔀 Combo' },
+  { value: 'Meditation', label: '🧘 Meditation' },
+  { value: 'Oneiric', label: '💤 Oneiric (Dreams)' },
+  { value: 'Stimulants', label: '⚡ Stimulants' },
+  { value: 'Depressants', label: '😴 Depressants' },
+  { value: 'Entactogens', label: '💗 Entactogens' },
+  { value: 'Cannabinoids', label: '🌿 Cannabinoids' },
+  { value: 'Deliriants', label: '🌫️ Deliriants' },
+  { value: 'Other', label: '❓ Other' }
+];
+  constructor(
+    private postService: PostService,
+    private router: Router
+  ) {}
+
+  submitExperience(form: any) {
+    // Verifica login
+    if (!localStorage.getItem('token')) {
+      this.error = 'You must be logged in to submit a post';
+      setTimeout(() => this.router.navigate(['/login']), 2000);
+      return;
+    }
+
+    if (form.invalid) {
+      Object.values(form.controls).forEach((control: any) => {
+        control.markAsTouched();
+      });
+      return;
+    }
+
+    const post: Post = {
+      id: 0,
+      title: this.title,
+      category: this.category,
+      body: this.body,
+      author: '',
+    };
+
+    this.postService.createPost(post).subscribe({
+      next: (res) => {
+        console.log('✅ Post created:', res);
+        this.success = 'Post submitted successfully!';
+        this.title = '';
+        this.category = '';
+        this.body = '';
+        this.error = '';
+        form.resetForm();
+
+        setTimeout(() => {
+          this.router.navigate(['/explore']);
+        }, 1500);
+      },
+      error: (err: any) => {
+        console.error('❌ Error:', err);
+        if (err.status === 401) {
+          this.error = 'Session expired. Please login again.';
+          setTimeout(() => this.router.navigate(['/login']), 2000);
+        } else {
+          this.error = err.error?.error || 'Failed to submit post';
+        }
+        this.success = '';
+      },
+    });
+  }
+}
+import { Component } from '@angular/core';
+import { Router, RouterOutlet, RouterLink } from '@angular/router';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { MatButtonModule } from '@angular/material/button';
+import { MatIconModule } from '@angular/material/icon';
+import { MatListModule } from '@angular/material/list';
+import { MatMenuModule } from '@angular/material/menu';  // ← AGGIUNGI
+import { CommonModule } from '@angular/common';
+
+@Component({
+  selector: 'app-root',
+  standalone: true,
+  imports: [
+    RouterOutlet,
+    RouterLink,
+    MatSidenavModule,
+    MatButtonModule,
+    MatIconModule,
+    MatListModule,
+    MatMenuModule,  // ← AGGIUNGI
+    CommonModule
+  ],
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent {
+  title = 'Consciousness Explorer';
+
+  constructor(private router: Router) {}
+
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('token');
+  }
+
+  getUsername(): string {
+    return localStorage.getItem('username') || '';
+  }
+
+  isAdmin(): boolean {
+    return localStorage.getItem('role') === 'admin';
+  }
+
+  logout() {
+    localStorage.removeItem('token');
+    localStorage.removeItem('username');
+    localStorage.removeItem('role');
+    this.router.navigate(['/home']);
+  }
+
+  goToProfile() {
+    this.router.navigate(['/profile']);
+  }
+
+  goToSettings() {
+    this.router.navigate(['/settings']);
+  }
+}
+.sidenav-container {
+  height: 100vh;
+  background: #0a0a0f;
+}
+
+.sidenav {
+  width: 280px;
+  background: #151520;
+  color: #e5e7eb;
+  border-right: 2px solid #00ffff;
+  box-shadow: 2px 0 15px rgba(0, 255, 255, 0.2);
+}
+
+.sidenav-header {
+  padding: 20px;
+  background: linear-gradient(135deg, #1a1f3a 0%, #0a0e27 100%);
+  border-bottom: 2px solid #00ffff;
+}
+
+.sidenav-header h2 {
+  margin: 0;
+  color: #00ffff;
+  font-family: 'Orbitron', sans-serif;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  font-size: 1.5rem;
+}
+
+mat-nav-list a {
+  color: #e5e7eb !important;
+  margin: 5px 10px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  padding: 12px 16px;
+  display: flex;
+  align-items: center;
+}
+
+mat-nav-list a:hover {
+  background: #1f1f2e !important;
+  color: #00ffff !important;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+}
+
+mat-nav-list mat-icon {
+  color: #00ffff;
+  margin-right: 15px;
+}
+
+.main-content {
+  background: #0a0a0f;
+  color: #e5e7eb;
+}
+.sidenav mat-nav-list a span {
+  color: #e5e7eb !important;
+  font-size: 15px !important;
+  font-weight: bold !important;
+  font-family: monospace !important;
+}
+.toolbar {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  background: linear-gradient(135deg, #1a1f3a 0%, #0a0e27 100%);
+  border-bottom: 1px solid #00ffff;
+  gap: 15px;
+}
+
+.toolbar button {
+  color: #00ffff !important;
+}
+
+.toolbar h1 {
+  margin: 0;
+  font-family: 'Orbitron', sans-serif;
+  color: #00ffff;
+  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  font-size: 1.8rem;
+}
+
+.content-area {
+  padding: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.spacer {
+  flex: 1;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 10px;
+}
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.user-info span {
+  color: #00ffff;
+}
+/* ... stili esistenti ... */
+
+/* Stili per il menu utente */
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.username-display {
+  color: #00ffff;
+  font-weight: bold;
+  font-family: monospace;
+}
+
+.user-info button {
+  color: #00ffff !important;
+}
+
+/* Stili per il menu dropdown Material */
+::ng-deep .mat-mdc-menu-panel {
+  background: #1a1f3a !important;
+  border: 2px solid #00ffff;
+  border-radius: 8px;
+}
+
+::ng-deep .mat-mdc-menu-item {
+  color: #e5e7eb !important;
+}
+
+::ng-deep .mat-mdc-menu-item:hover {
+  background: #2a2f4a !important;
+  color: #00ffff !important;
+}
+
+::ng-deep .mat-mdc-menu-item mat-icon {
+  color: #00ffff;
+  margin-right: 10px;
+}
+
+::ng-deep .mat-divider {
+  border-top-color: #00ffff40;
+}
+<mat-drawer-container class="sidenav-container">
+  <mat-drawer #drawer mode="side" opened class="sidenav">
+    <div class="sidenav-header">
+      <h2>Navigation</h2>
+    </div>
+    <mat-nav-list>
+      <a mat-list-item routerLink="/home">
+        <mat-icon>home</mat-icon>
+        <span class="mat-line">Home</span>
+      </a>
+      <a mat-list-item routerLink="/explore">
+        <mat-icon>explore</mat-icon>
+        <span class="mat-line">Explore</span>
+      </a>
+      <a mat-list-item routerLink="/substances">
+        <mat-icon>science</mat-icon>
+        <span class="mat-line">Substances</span>
+      </a>
+      <a mat-list-item routerLink="/submit">
+        <mat-icon>add_circle</mat-icon>
+        <span class="mat-line">Submit Experience</span>
+      </a>
+      <a mat-list-item routerLink="/harm-reduction">
+        <mat-icon>health_and_safety</mat-icon>
+        <span class="mat-line">Harm Reduction</span>
+      </a>
+    </mat-nav-list>
+  </mat-drawer>
+
+  <mat-drawer-content class="main-content">
+    <div class="toolbar">
+      <button mat-icon-button (click)="drawer.toggle()">
+        <mat-icon>menu</mat-icon>
+      </button>
+      <h1>{{ title }}</h1>
+
+      <div class="spacer"></div>
+
+      <!-- LOGIN/REGISTER BUTTONS (non loggato) -->
+      <div class="auth-buttons" *ngIf="!isLoggedIn()">
+        <button mat-button routerLink="/login">Login</button>
+        <button mat-raised-button color="primary" routerLink="/register">Register</button>
+      </div>
+
+      <!-- USER MENU (loggato) -->
+      <div class="user-info" *ngIf="isLoggedIn()">
+        <span class="username-display">{{ getUsername() }}</span>
+
+        <!-- ✅ MENU DROPDOWN -->
+        <button mat-icon-button [matMenuTriggerFor]="userMenu">
+          <mat-icon>account_circle</mat-icon>
+        </button>
+
+        <mat-menu #userMenu="matMenu">
+          <button mat-menu-item (click)="goToProfile()">
+            <mat-icon>person</mat-icon>
+            <span>Profile</span>
+          </button>
+
+          <button mat-menu-item (click)="goToSettings()">
+            <mat-icon>settings</mat-icon>
+            <span>Settings</span>
+          </button>
+
+          <!-- Admin Panel (solo per admin) -->
+          <button mat-menu-item *ngIf="isAdmin()" routerLink="/admin">
+            <mat-icon>admin_panel_settings</mat-icon>
+            <span>Admin Panel</span>
+          </button>
+
+          <mat-divider></mat-divider>
+
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Logout</span>
+          </button>
+        </mat-menu>
+      </div>
+    </div>
+
+    <div class="content-area">
+      <router-outlet></router-outlet>
+    </div>
+  </mat-drawer-content>
+</mat-drawer-container>
+import { Routes } from '@angular/router';
+import { Explore } from './pages/explore/explore';
+import { PostDetailComponent } from './pages/post-detail/post-detail.component';
+import { SubmitExperienceComponent } from './submit-experience/submit-experience';
+import { HomeComponent } from './pages/home/home';
+import { Login } from './pages/login/login';
+import { Register } from './pages/register/register';
+import { SubstancesComponent } from '../pages/substances/substances';
+import { SubstanceDetailComponent } from './pages/substance-detail/substance-detail.component';
+
+export const routes: Routes = [
+  { path: 'home', component: HomeComponent },
+  { path: 'explore', component: Explore },
+  { path: 'post/:id', component: PostDetailComponent },
+  { path: 'submit', component: SubmitExperienceComponent },
+  { path: 'login', component: Login },
+  { path: 'register', component: Register },
+  { path: 'substances', component: SubstancesComponent },
+  { path: 'substance/:id', component: SubstanceDetailComponent },  // ✅ FIXED
+  { path: 'harm-reduction', component: HomeComponent },
+  { path: '', redirectTo: '/home', pathMatch: 'full' },
+  { path: '**', redirectTo: '/home' }
+];
+
+// Include theming for Angular Material with `mat.theme()`.
+// This Sass mixin will define CSS variables that are used for styling Angular Material
+// components according to the Material 3 design spec.
+// Learn more about theming and how to use it for your application's
+// custom components at https://material.angular.dev/guide/theming
+@use '@angular/material' as mat;
+
+html {
+  @include mat.theme((
+    color: (
+      primary: mat.$azure-palette,
+      tertiary: mat.$blue-palette,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+}
+
+body {
+  // Default the application to a light color theme. This can be changed to
+  // `dark` to enable the dark color theme, or to `light dark` to defer to the
+  // user's system settings.
+  color-scheme: light;
+
+  // Set a default background, font and text colors for the application using
+  // Angular Material's system-level CSS variables. Learn more about these
+  // variables at https://material.angular.dev/guide/system-variables
+  background-color: var(--mat-sys-surface);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+
+  // Reset the user agent margin.
+  margin: 0;
+}
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>ConsciousnessExplorer</title>
+  <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <base href="/">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="icon" type="image/x-icon" href="favicon.ico">
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+  <app-root></app-root>
+</body>
+</html>
+import { ComponentFixture, TestBed } from '@angular/core/testing';
+
+import { Substances } from './substances';
+
+describe('Substances', () => {
+  let component: Substances;
+  let fixture: ComponentFixture<Substances>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      imports: [Substances]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(Substances);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+<div class="substances-container">
+
+  <div class="header">
+    <h1>Substance Database</h1>
+    <p class="subtitle">Comprehensive information for harm reduction and education</p>
+  </div>
+
+  <div class="substances-grid">
+    <div *ngFor="let substance of substances" class="substance-card" (click)="viewSubstance(substance.id)">
+
+      <div class="substance-image">
+        <img [src]="substance.image" [alt]="substance.name" />
+        <span
+          class="risk-badge"
+          [style.background]="getRiskColor(substance.risk) + '20'"
+          [style.border-color]="getRiskColor(substance.risk)"
+          [style.color]="getRiskColor(substance.risk)">
+          {{ substance.risk }} risk
+        </span>
+      </div>
+
+      <div class="substance-content">
+        <div class="substance-header">
+          <h2>{{ substance.name }}</h2>
+          <span class="category-badge">{{ substance.category }}</span>
+        </div>
+
+        <div class="substance-details">
+          <div class="detail-row">
+            <span class="label">Molecular Name:</span>
+            <span class="value">{{ substance.molecularName }}</span>
+          </div>
+
+          <div class="detail-row">
+            <span class="label">Formula:</span>
+            <span class="value formula">{{ substance.formula }}</span>
+          </div>
+
+          <div class="detail-row">
+            <span class="label">Also known as:</span>
+            <div class="aliases">
+              <span *ngFor="let alias of substance.alsoKnownAs" class="alias-tag">
+                {{ alias }}
+              </span>
+            </div>
+          </div>
+
+          <p class="description" *ngIf="substance.description">
+            {{ substance.description }}
+          </p>
+        </div>
+
+        <button mat-raised-button color="primary" class="learn-more-btn">
+          Learn More
+        </button>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <h3>⚠️ Disclaimer</h3>
+    <p>
+      This information is provided for educational and harm reduction purposes only.
+      The use of psychoactive substances carries risks. Always research thoroughly,
+      start with low doses, and never combine substances without proper knowledge.
+    </p>
+  </div>
+
+</div>
+.substances-container {
+  padding: 40px 20px;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.header h2 {
+  color: #00ffff;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.5rem;
+  margin-bottom: 10px;
+  text-shadow: 0 0 20px rgba(0, 255, 255, 0.8);
+}
+
+.header p {
+  color: #9ca3af;
+  font-size: 1.2rem;
+}
+
+.category-filter {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 40px;
+  flex-wrap: wrap;
+}
+
+.filter-btn {
+  background: linear-gradient(135deg, #1a1f3a 0%, #0a0e27 100%);
+  color: #00ffff;
+  border: 2px solid #00ffff40;
+  padding: 10px 25px;
+  border-radius: 25px;
+  cursor: pointer;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.filter-btn:hover {
+  background: #1a1f3a;
+  border-color: #00ffff;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+.filter-btn.active {
+  background: #00ffff;
+  color: #0a0a0f;
+  border-color: #00ffff;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+}
+
+.substances-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 30px;
+}
+
+.substance-card {
+  background: linear-gradient(135deg, #1a1f3a 0%, #0a0e27 100%);
+  border: 2px solid #00ffff;
+  border-radius: 12px;
+  padding: 25px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+
+.substance-card::before {
+  content: '';
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(circle, rgba(0, 255, 255, 0.1) 0%, transparent 70%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.substance-card:hover::before {
+  opacity: 1;
+}
+
+.substance-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 35px rgba(0, 255, 255, 0.5);
+  border-color: #00ffff;
+}
+
+.card-image-container {
+  text-align: center;
+  margin-bottom: 20px;
+}
+
+.substance-image {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  border: 3px solid #00ffff;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.4);
+  object-fit: cover;
+  transition: all 0.3s ease;
+}
+
+.substance-card:hover .substance-image {
+  box-shadow: 0 0 30px rgba(0, 255, 255, 0.8);
+  transform: scale(1.05);
+}
+
+.category-badge {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  background: #00ffff20;
+  color: #00ffff;
+  padding: 5px 12px;
+  border-radius: 15px;
+  font-size: 0.8rem;
+  font-weight: bold;
+  border: 1px solid #00ffff;
+}
+
+.card-content {
+  text-align: center;
+}
+
+.substance-name {
+  color: #00ffff;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.8rem;
+  margin-bottom: 8px;
+}
+
+.molecular-name {
+  color: #9ca3af;
+  font-size: 0.9rem;
+  font-style: italic;
+  margin-bottom: 10px;
+}
+
+.formula {
+  color: #00ffff;
+  font-family: 'Courier New', monospace;
+  font-size: 1.1rem;
+  margin-bottom: 15px;
+  padding: 8px 12px;
+  background: #0a0e27;
+  border-radius: 6px;
+  display: inline-block;
+}
+
+.aka-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  justify-content: center;
+  margin-bottom: 15px;
+}
+
+.aka-tag {
+  background: #00ffff10;
+  color: #9ca3af;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  border: 1px solid #00ffff30;
+}
+
+.short-description {
+  color: #e5e7eb;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  font-size: 0.95rem;
+}
+
+.view-details-btn {
+  background: #00ffff;
+  color: #0a0a0f;
+  border: none;
+  padding: 10px 25px;
+  border-radius: 6px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Orbitron', sans-serif;
+}
+
+.view-details-btn:hover {
+  background: #00cccc;
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.6);
+  transform: scale(1.05);
+}
+
+.disclaimer {
+  background: #ff000020;
+  border: 2px solid #ff6b6b;
+  padding: 20px;
+  border-radius: 12px;
+  margin-top: 40px;
+  text-align: center;
+  color: #ff6b6b;
+}
+
+.disclaimer h4 {
+  color: #ff0000;
+  margin-bottom: 10px;
+  font-family: 'Orbitron', sans-serif;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .substances-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .header h2 {
+    font-size: 2rem;
+  }
+
+  .category-filter {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .filter-btn {
+    width: 100%;
+  }
+}
+import { Component, OnInit } from '@angular/core';
+import { Router, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
+import { MatCardModule } from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
+
+interface Substance {
+  id: number;
+  name: string;
+  molecularName: string;
+  formula: string;
+  alsoKnownAs: string[];
+  image: string;
+  category: string;
+  shortDescription: string;
+}
+
+@Component({
+  selector: 'app-substances',
+  standalone: true,
+  imports: [CommonModule, RouterLink, MatCardModule, MatButtonModule],
+  templateUrl: './substances.component.html',
+  styleUrls: ['./substances.component.css']
+})
+export class SubstancesComponent implements OnInit {
+  substances: Substance[] = [
+    {
+      id: 1,
+      name: 'DMT',
+      molecularName: 'N,N-Dimethyltryptamine',
+      formula: 'C₁₂H₁₆N₂',
+        alsoKnownAs: ['Dimitri', 'Spirit Molecule'],
+        image: 'assets/dmt.png',
+        category: 'Psychedelic',
+        shortDescription: 'Powerful short-acting psychedelic producing intense visual experiences'
+    },
+    {
+      id: 2,
+      name: 'LSD',
+      molecularName: 'Lysergic Acid Diethylamide',
+      formula: 'C₂₀H₂₅N₃O',
+        alsoKnownAs: ['Acid', 'Lucy'],
+        image: 'assets/lsd.png',
+        category: 'Psychedelic',
+        shortDescription: 'Long-lasting psychedelic known for profound consciousness alterations'
+    },
+    {
+      id: 3,
+      name: 'Psilocybin',
+      molecularName: '4-phosphoryloxy-N,N-dimethyltryptamine',
+      formula: 'C₁₂H₁₇N₂O₄P',
+        alsoKnownAs: ['Magic Mushrooms', 'Shrooms'],
+        image: 'assets/psilocibina.png',
+        category: 'Psychedelic',
+        shortDescription: 'Natural psychedelic from mushrooms with introspective properties'
+    },
+    {
+      id: 4,
+      name: 'MDMA',
+      molecularName: '3,4-Methylenedioxymethamphetamine',
+      formula: 'C₁₁H₁₅NO₂',
+        alsoKnownAs: ['Ecstasy', 'Molly'],
+        image: 'assets/mdma.png',
+        category: 'Entactogen',
+        shortDescription: 'Empathogenic substance producing euphoria and emotional openness'
+    },
+    {
+      id: 5,
+      name: 'Ketamine',
+      molecularName: '(RS)-2-(2-Chlorophenyl)-2-(methylamino)cyclohexanone',
+      formula: 'C₁₃H₁₆ClNO',
+        alsoKnownAs: ['K', 'Special K'],
+        image: 'assets/ketamine.png',
+        category: 'Dissociative',
+        shortDescription: 'Dissociative anesthetic producing out-of-body experiences'
+    },
+    {
+      id: 6,
+      name: 'Cannabis',
+      molecularName: 'Delta-9-Tetrahydrocannabinol',
+      formula: 'C₂₁H₃₀O₂',
+        alsoKnownAs: ['Weed', 'Marijuana'],
+        image: 'assets/cannabis.png',
+        category: 'Cannabinoid',
+        shortDescription: 'Plant containing psychoactive compounds producing relaxation'
+    },
+    {
+      id: 7,
+      name: 'Mescaline',
+      molecularName: '3,4,5-Trimethoxyphenethylamine',
+      formula: 'C₁₁H₁₇NO₃',
+        alsoKnownAs: ['Peyote', 'San Pedro'],
+        image: 'assets/mescaline.png',
+        category: 'Psychedelic',
+        shortDescription: 'Natural psychedelic from cacti with spiritual significance'
+    }
+  ];
+
+  filteredSubstances: Substance[] = [];
+  categories = ['All', 'Psychedelic', 'Dissociative', 'Entactogen', 'Cannabinoid'];
+  selectedCategory = 'All';
+
+  constructor(private router: Router) {}
+
+  ngOnInit() {
+    this.filteredSubstances = this.substances;
+  }
+
+  filterByCategory(category: string) {
+    this.selectedCategory = category;
+    if (category === 'All') {
+      this.filteredSubstances = this.substances;
+    } else {
+      this.filteredSubstances = this.substances.filter(s => s.category === category);
+    }
+  }
+
+  viewSubstance(id: number) {
+    this.router.navigate(['/substance', id]);
+  }
+}
+.post-detail-container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.loading, .error {
+  text-align: center;
+  padding: 60px 20px;
+  color: #00ffff;
+}
+
+.error {
+  color: #ff6b6b;
+}
+
+/* Back Button */
+.back-btn {
+  color: #00ffff !important;
+  margin-bottom: 20px;
+}
+
+.back-btn mat-icon {
+  margin-right: 8px;
+}
+
+/* Post Header */
+.post-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.category {
+  background: #00ffff20;
+  color: #00ffff;
+  padding: 8px 16px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  border: 1px solid #00ffff;
+}
+
+.date {
+  color: #9ca3af;
+  font-size: 0.9rem;
+}
+
+/* Post Title */
+.post-title {
+  color: #00ffff;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 2.5rem;
+  margin-bottom: 20px;
+  text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+}
+
+/* Post Meta */
+.post-meta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-bottom: 20px;
+  border-bottom: 2px solid #00ffff40;
+  margin-bottom: 30px;
+}
+
+.author {
+  color: #9ca3af;
+  font-style: italic;
+}
+
+.stats {
+  display: flex;
+  gap: 20px;
+  color: #9ca3af;
+}
+
+.stats span {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.stats mat-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+/* Post Body */
+.post-body {
+  background: #1a1f3a;
+  padding: 30px;
+  border-radius: 12px;
+  border: 2px solid #00ffff40;
+  margin-bottom: 30px;
+  line-height: 1.8;
+  color: #e5e7eb;
+  font-size: 1.1rem;
+}
+
+/* Action Bar */
+.action-bar {
+  margin-bottom: 40px;
+}
+
+.like-btn {
+  font-size: 1rem;
+}
+
+.like-btn mat-icon {
+  margin-right: 8px;
+}
+
+/* Comments Section */
+.comments-section {
+  margin-top: 60px;
+}
+
+.comments-section h2 {
+  color: #00ffff;
+  font-family: 'Orbitron', sans-serif;
+  margin-bottom: 30px;
+  font-size: 1.8rem;
+}
+
+/* Add Comment */
+.add-comment {
+  background: #1a1f3a;
+  padding: 20px;
+  border-radius: 12px;
+  border: 2px solid #00ffff40;
+  margin-bottom: 30px;
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+.login-prompt {
+  text-align: center;
+  padding: 30px;
+  background: #1a1f3a;
+  border-radius: 12px;
+  border: 2px dashed #00ffff40;
+  margin-bottom: 30px;
+}
+
+.login-prompt a {
+  color: #00ffff;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+/* Comments List */
+.comments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.comment-card {
+  background: #1a1f3a;
+  padding: 20px;
+  border-radius: 12px;
+  border: 2px solid #00ffff20;
+  transition: all 0.3s ease;
+}
+
+.comment-card:hover {
+  border-color: #00ffff;
+  box-shadow: 0 0 15px rgba(0, 255, 255, 0.2);
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.comment-author {
+  color: #00ffff;
+  font-weight: bold;
+}
+
+.comment-date {
+  color: #9ca3af;
+  font-size: 0.85rem;
+}
+
+.comment-body {
+  color: #e5e7eb;
+  line-height: 1.6;
+  margin-bottom: 10px;
+}
+
+.delete-comment-btn {
+  color: #ff6b6b !important;
+  font-size: 0.9rem;
+}
+
+.no-comments {
+  text-align: center;
+  padding: 40px;
+  color: #9ca3af;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .post-title {
+    font-size: 1.8rem;
+  }
+
+  .post-meta {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
