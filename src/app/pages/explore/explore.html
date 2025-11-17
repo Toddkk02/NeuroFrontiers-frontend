@@ -4,52 +4,38 @@
     <p>Browse shared experiences from the community</p>
   </div>
 
+  <!-- Loading -->
   <div *ngIf="loading" class="loading">
     <p>Loading...</p>
   </div>
 
+  <!-- Error -->
   <div *ngIf="error" class="error">
     <p>{{ error }}</p>
   </div>
 
+  <!-- Posts Grid -->
   <div *ngIf="!loading && !error" class="experiences-grid">
-    <div *ngFor="let post of posts" class="experience-card" (click)="openPost(post.id)">
-
+    <div *ngFor="let post of posts" class="experience-card">
       <div class="card-header">
-        <span class="category" [attr.data-category]="post.category">
-          {{ post.category || 'Experience' }}
-        </span>
-        <span class="date">{{ formatDate(post.created_at) }}</span>
+        <span class="category psychedelics">{{ post.category || 'Experience' }}</span>
+
       </div>
 
       <h3 class="card-title">{{ post.title }}</h3>
 
       <p class="card-preview">
-        {{ truncateText(post.body, 150) }}
+        {{ post.body }}
       </p>
+
 
       <span class="post-author">By {{ post.author }}</span>
 
-      <!-- ✅ AGGIUNGI QUESTA SEZIONE -->
-      <div class="card-stats">
-        <span class="stat">
-          <mat-icon>thumb_up</mat-icon>
-          {{ post.likes || 0 }}
-        </span>
-        <span class="stat">
-          <mat-icon>comment</mat-icon>
-          {{ post.comment_count || 0 }}
-        </span>
-        <span class="stat">
-          <mat-icon>visibility</mat-icon>
-          {{ post.views || 0 }}
-        </span>
-      </div>
+      <div class="card-footer">
 
-      <!-- Delete button solo per admin -->
-      <div class="card-footer" *ngIf="isAdmin()">
         <button
-          (click)="deletePost(post.id, $event)"
+          *ngIf="isAdmin()"
+          (click)="deletePost(post.id)"
           class="delete-btn">
           Delete
         </button>

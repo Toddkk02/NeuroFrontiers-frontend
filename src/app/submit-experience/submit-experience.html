@@ -1,39 +1,28 @@
+
 <div class="submit-container">
   <h2>Submit Experience</h2>
 
+  <!-- aggiungi #form="ngForm" -->
   <form class="experience-form" #form="ngForm" (ngSubmit)="submitExperience(form)">
 
-    <!-- Title -->
     <mat-form-field class="full-width">
       <mat-label>Title</mat-label>
       <input matInput [(ngModel)]="title" name="title" required #titleField="ngModel">
       <mat-error *ngIf="titleField.invalid && titleField.touched">Title is required</mat-error>
     </mat-form-field>
 
-    <!-- ✅ CATEGORY DROPDOWN -->
     <mat-form-field class="full-width">
       <mat-label>Category</mat-label>
-      <mat-select [(ngModel)]="category" name="category" required #categoryField="ngModel">
-        <mat-option value="Psychedelics">Psychedelics</mat-option>
-        <mat-option value="Dissociatives">Dissociatives</mat-option>
-        <mat-option value="Combo">Combo</mat-option>
-        <mat-option value="Meditation">Meditation</mat-option>
-        <mat-option value="Oneiric">Oneiric (Dreams)</mat-option>
-        <mat-option value="Stimulants">Stimulants</mat-option>
-        <mat-option value="Depressants">Depressants</mat-option>
-        <mat-option value="Other">Other</mat-option>
-      </mat-select>
+      <input matInput [(ngModel)]="category" name="category" required #categoryField="ngModel">
       <mat-error *ngIf="categoryField.invalid && categoryField.touched">Category is required</mat-error>
     </mat-form-field>
 
-    <!-- Experience Description -->
     <mat-form-field class="full-width">
       <mat-label>Experience Description</mat-label>
       <textarea matInput [(ngModel)]="body" name="body" rows="10" required #bodyField="ngModel"></textarea>
       <mat-error *ngIf="bodyField.invalid && bodyField.touched">Description is required</mat-error>
     </mat-form-field>
 
-    <!-- Submit Button -->
     <button mat-raised-button color="primary" type="submit" [disabled]="form.invalid">
       Submit
     </button>

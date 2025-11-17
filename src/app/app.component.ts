@@ -4,7 +4,6 @@ import { MatSidenavModule } from '@angular/material/sidenav';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatListModule } from '@angular/material/list';
-import { MatMenuModule } from '@angular/material/menu';  // ← AGGIUNGI
 import { CommonModule } from '@angular/common';
 
 @Component({
@@ -17,7 +16,6 @@ import { CommonModule } from '@angular/common';
     MatButtonModule,
     MatIconModule,
     MatListModule,
-    MatMenuModule,  // ← AGGIUNGI
     CommonModule
   ],
   templateUrl: './app.component.html',
@@ -36,22 +34,10 @@ export class AppComponent {
     return localStorage.getItem('username') || '';
   }
 
-  isAdmin(): boolean {
-    return localStorage.getItem('role') === 'admin';
-  }
-
   logout() {
     localStorage.removeItem('token');
     localStorage.removeItem('username');
     localStorage.removeItem('role');
     this.router.navigate(['/home']);
-  }
-
-  goToProfile() {
-    this.router.navigate(['/profile']);
-  }
-
-  goToSettings() {
-    this.router.navigate(['/settings']);
   }
 }

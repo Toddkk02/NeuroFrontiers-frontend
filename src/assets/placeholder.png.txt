@@ -1,7 +1,0 @@
-Per creare un placeholder:
-1. Vai su https://via.placeholder.com/200x200/1a1f3a/00ffff?text=?
-2. Scarica l'immagine
-3. Rinomina in placeholder.png
-4. Metti in src/assets/
-
-Oppure usa qualsiasi immagine 200x200px
